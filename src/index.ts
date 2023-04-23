@@ -3,8 +3,6 @@ import html2canvas from "html2canvas";
 import { PageParameter } from "model/page-parameter";
 
 async function html2pdf(
-  window: any,
-  document: any,
   htmlBody: any,
   htmlHeader: any,
   htmlFooter: any
@@ -114,7 +112,7 @@ async function html2pdf(
   });
 
   //计算Canvas与图片html高度缩放比率.
-  let bodyRect = getElementRect(window, document, htmlBody);
+  let bodyRect = getElementRect(htmlBody);
   let bodyTopOffset = bodyRect.top;
   let zoomRatio = Number(
     (bodyCanvas.height / scale / contentHeight).toFixed(0)
@@ -125,8 +123,6 @@ async function html2pdf(
   let currentPageIndex = 1;
   let currentPageStartPosition = 0;
   let currentPageEndPosition = getPageElements(
-    window,
-    document,
     htmlBody,
     contentHeight,
     zoomRatio,
@@ -152,7 +148,7 @@ async function html2pdf(
     );
 
     if (currentPageIndex === 1) {
-      downloadImageData(document, currentPageImageData);
+      downloadImageData(currentPageImageData);
     }
 
     if (currentPageIndex > 1) {
@@ -224,8 +220,6 @@ async function html2pdf(
     currentPageIndex++;
     currentPageStartPosition = currentPageEndPosition;
     currentPageEndPosition = getPageElements(
-      window,
-      document,
       htmlBody,
       contentHeight,
       zoomRatio,
@@ -285,8 +279,6 @@ function getElementCanvas(
 }
 
 function getPageElements(
-  window: any,
-  document: any,
   element: any,
   contentHeight: number,
   zoomRatio: number,
@@ -303,7 +295,7 @@ function getPageElements(
   let maxPagePosition = pageStartPosition + imgHeight;
   let pageEndPosition = maxPagePosition;
   while (child) {
-    let elementRect = getElementRect(window, document, child);
+    let elementRect = getElementRect(child);
     let elementX = Number(
       ((elementRect.top - bodyTopOffset) * zoomRatio).toFixed(0)
     );
@@ -393,8 +385,6 @@ function getPageElements(
         if (child.tagName != "TR" && child.firstElementChild) {
           //如果元素不是TR, 并且元素包含子元素, 则遍历子元素, 根据子元素分页.
           pageEndPosition = getPageElements(
-            window,
-            document,
             child,
             contentHeight,
             zoomRatio,
@@ -430,8 +420,6 @@ function getPageElements(
             if (child.firstElementChild) {
               //如果有子元素, 递归处理子元素
               pageEndPosition = getPageElements(
-                window,
-                document,
                 child,
                 contentHeight,
                 zoomRatio,
@@ -443,7 +431,6 @@ function getPageElements(
             } else {
               //如果是其他dev等元素中的文本跨页, 则按照文本行数分页.
               pageEndPosition = getPageElementPosition(
-                window,
                 child,
                 elementX,
                 imgHeight,
@@ -464,7 +451,6 @@ function getPageElements(
 }
 
 function getPageElementPosition(
-  window: any,
   element: any,
   elementX: number,
   imgHeight: number,
@@ -505,7 +491,7 @@ function getPageElementPosition(
 }
 
 //以一个对象的x和y属性放回滚动条的位置
-function getScrollOffsets(window: any, document: any) {
+function getScrollOffsets() {
   //除了IE 8以及更早的版本以外，其他浏览器都支持
   if (window.pageXOffset != null)
     return {
@@ -527,9 +513,9 @@ function getScrollOffsets(window: any, document: any) {
 }
 
 //元素相对于文档的坐标位置
-function getElementRect(window: any, document: any, element: any) {
+function getElementRect(element: any) {
   let box = element.getBoundingClientRect();
-  let offsets = getScrollOffsets(window, document);
+  let offsets = getScrollOffsets();
   let x = box.left + offsets.x;
   let y = box.top + offsets.y;
 
@@ -555,7 +541,7 @@ function dataURLtoBlob(dataurl: any) {
   });
 }
 
-function downloadDataURL(document: any, imgData:any) {
+function downloadDataURL(imgData:any) {
   let blob = dataURLtoBlob(imgData);
   let objurl = URL.createObjectURL(blob);
   let link = document.createElement("a");
@@ -564,13 +550,12 @@ function downloadDataURL(document: any, imgData:any) {
   link.click();
 }
 
-function downloadImageData(document: any, imageData:any) {
+function downloadImageData(imageData:any) {
   let cvs = document.createElement("canvas");
   let ctx = cvs.getContext('2d');
   cvs.width = imageData.width;
   cvs.height = imageData.height;
-  ctx.putImageData(imageData, 0, 0);
+  ctx?.putImageData(imageData, 0, 0);
   let imgData = cvs.toDataURL("image/png");
-  downloadDataURL(document, imgData);
-  cvs = null;
+  downloadDataURL(imgData);
 }

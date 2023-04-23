@@ -3,6 +3,8 @@ import html2canvas from "html2canvas";
 import { PageParameter } from "model/page-parameter";
 
 async function html2pdf(
+  window: any,
+  document: any,
   htmlBody: any,
   htmlHeader: any,
   htmlFooter: any

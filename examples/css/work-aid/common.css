@@ -1,0 +1,266 @@
+/* COMMON */
+
+html,
+body {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.5em;
+  letter-spacing: 0.03125em;
+  word-break: break-word;
+}
+
+/* Table in panel */
+.panel table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.panel table thead tr {
+  line-height: 32px;
+}
+
+.panel table thead tr:first-child {
+  background-color: #ced2d4;
+}
+
+.panel table tbody tr:nth-child(even) {
+  background-color: rgba(206, 210, 212, 0.6);
+}
+
+.panel table tr {
+  border: 1px solid #ced2d4;
+  border-top: none;
+}
+
+.panel table th,
+.panel table td {
+  padding: 0 6px;
+  text-align: left;
+}
+
+.panel table th {
+  vertical-align: middle;
+  word-break: normal;
+}
+
+.panel table td {
+  vertical-align: top;
+}
+
+.panel table tbody td {
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+}
+
+/* List */
+ol, ul {
+  margin: 0;
+  padding: 0 0 0 1em;
+}
+
+.keep-line-break {
+  white-space: pre-line;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
+/* Header */
+.header {
+  display: -webkit-box !important;
+  display: flex !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  border-radius: 0 !important;
+  line-height: 1.2em;
+}
+
+/* Reaction vessel */
+.rv-table {
+  table-layout: fixed;
+}
+
+.rv-table th:first-child {
+  width: 30px;
+}
+
+.rv-table td {
+  border-left: 1px solid #ced2d4;
+}
+
+.rv-table td:first-child {
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Malformed data render */
+.unable-display-table td {
+  text-align: center;
+  padding: 1em 0;
+}
+
+/* Footer, the template of footer is in back end. */
+.footer {
+  font-size: 20px;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.mat-card {
+  display: block;
+  position: relative;
+  padding: 8px;
+}
+
+.mat-card-avatar {
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.mat-card > :first-child,
+.mat-card-content > :first-child {
+  margin-top: 0;
+}
+
+.mat-card > :last-child:not(.mat-card-footer),
+.mat-card-content > :last-child:not(.mat-card-footer) {
+  margin-bottom: 0;
+}
+
+.mat-icon {
+  background-repeat: no-repeat;
+  display: inline-block;
+  fill: currentColor;
+  height: 24px;
+  width: 24px;
+}
+
+.header .header-icon-container {
+  display: block;
+  width: 90px;
+  height: 90px;
+  margin-right: 8px;
+}
+
+.header .header-icon {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Panel */
+.panel {
+  margin: 15px 10px;
+  padding-top: 10px;
+  -webkit-break-inside: avoid-page;
+  break-inside: avoid-page;
+  -webkit-page-break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.panel-title {
+  padding: 0 6px;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 2em;
+  border-radius: 5px 5px 0 0;
+  background-color: #156cae;
+  color: white;
+}
+
+.panel-title.warning {
+  background-color: #fbc02d;
+  color: black;
+}
+
+.panel-title.error {
+  background-color: #b00020;
+}
+
+.panel-icon {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+}
+
+.panel-icon::after {
+  position: absolute;
+  bottom: -10px;
+  content: "";
+  display: block;
+  width: 50px;
+  height: 50px;
+  background-size: 100% 100%;
+}
+
+/* Icon */
+.icon {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  background-size: 100% 100%;
+}
+
+.icon--done {
+  background-image: url("../../images/work-aid/done.svg");
+}
+
+.icon--error {
+  background-image: url("../../images/work-aid/error.svg");
+}
+
+.icon--info {
+  background-image: url("../../images/work-aid/info.svg");
+}
+
+.icon--pan-tool {
+  background-image: url("../../images/work-aid/pan-tool.svg");
+}
+
+.icon--warning {
+  background-image: url("../../images/work-aid/warning.svg");
+}
+
+.icon--ended {
+  background-image: url("../../images/work-aid/ended.svg")
+}
+
+/* Message box */
+.message-box {
+  display: -webkit-box;
+  display: flex;
+  border: 1px solid #ced2d4;
+  border-top: none;
+  padding: 6px;
+}
+
+.message-box .icon {
+  margin-right: 6px;
+}
+
+table .message-box {
+  border: none;
+  padding: 0;
+}
+
+.message-content {
+  -webkit-box-flex: 1;
+  flex-grow: 1;
+}
+
+/* Work aid and batch report header */
+.batch-info {
+  -webkit-box-flex: 1;
+  flex-grow: 1;
+}
+
+.generate-time {
+  margin-left: 12px;
+  white-space: nowrap;
+}
+
+.generate-time div {
+  text-align: right;
+}

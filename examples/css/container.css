@@ -1,0 +1,35 @@
+#outer {
+    padding: 0px 0px 0px 0px;
+    border: 1px solid #000;
+    margin: 20px;
+    width: 1123px;
+  }
+  
+  #doc-header{
+    font-family: sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #000;
+    line-height: 1.6em;
+    margin: 0px 36px 0px 36px;
+    position: relative;
+    height: 72px;
+  }
+  
+  #doc-body{
+    font-family: sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #000;
+    line-height: 1.6em;
+    margin: 0px 36px 0px 36px;
+    position: relative;
+  }
+  
+  #doc-footer {
+    font-family: sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #000;
+    line-height: 1.6em;
+    margin: 0px 36px 0px 36px;
+    position: relative;
+  }
+  

@@ -1,9 +1,8 @@
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { PageParameter } from "model/page-parameter";
 
 async function html2pdf(
-  window: any,
-  document: any,
   htmlBody: any,
   htmlHeader: any,
   htmlFooter: any
@@ -21,6 +20,7 @@ async function html2pdf(
   // 注意: 计算位置必须取整数, 不然计算表格时算法会出现下一行的开始位置小于上一行的结束位置, 造成算法错乱.
   let pageWidth = 1123;
   let pageHeight = 794;
+  let offsetWidth = 4; //截图时去除容器的外层边框, 否则会把容器的外层边线也复制到PDF中.
   // let contentWidth = htmlBody.offsetWidth;
   let contentHeight = htmlBody.offsetHeight;
 
@@ -30,7 +30,7 @@ async function html2pdf(
     allowTaint: true,
     useCORS: true, // 是否尝试使用CORS从服务器加载图像
     async: false, // 是否异步解析和呈现元素
-    scale: scale, // 处理模糊问题
+    scale: scale, // 处理模糊问题, 低于3截图会模糊
     dpi: 300, // 处理模糊问题
     background: "#ffffff", // 一定要添加背景颜色，否则出来的图片，背景全部都是透明的
     // width: contentWidth, // canvas宽度
@@ -58,7 +58,7 @@ async function html2pdf(
   headerPageImageData = headerContext.getImageData(
     0,
     0,
-    (headerWidth - 2) * scale,
+    (headerWidth - offsetWidth) * scale,
     headerContentHeight * scale
   );
   jsPdf.addImage(
@@ -66,7 +66,7 @@ async function html2pdf(
     "JPEG",
     margin.left,
     36,
-    headerWidth - 2,
+    headerWidth - offsetWidth,
     headerContentHeight,
     "header",
     "FAST"
@@ -89,7 +89,7 @@ async function html2pdf(
   footerPageImageData = footerContext.getImageData(
     0,
     0,
-    (footerWidth - 2) * scale,
+    (footerWidth - offsetWidth) * scale,
     footerContentHeight * scale
   );
 
@@ -145,11 +145,13 @@ async function html2pdf(
     let currentPageImageData = context.getImageData(
       sourceX * scale,
       (currentPageStartPosition - pageOffsetX) * scale,
-      (sourceWidth - 2) * scale,
+      (sourceWidth - offsetWidth) * scale,
       (currentPageHeight + pageOffsetX) * scale
     );
 
-    //downloadImageData(currentPageImageData);
+    if (currentPageIndex === 1) {
+      downloadImageData(document, currentPageImageData);
+    }
 
     if (currentPageIndex > 1) {
       jsPdf.addPage();
@@ -240,16 +242,14 @@ async function html2pdf(
   let pageNumberFontSize = 9;
   jsPdf.setFontSize(pageNumberFontSize);
   for (let i = 1; i <= pageCount; i++) {
-    // let pageVariables = {
-    //   pageNumber: i,
-    //   pageCount: pageCount,
-    // };
+    const pageParameters: PageParameter = {
+      pageNumber: i,
+      pageCount: pageCount,
+    };
     const pageText = "Page {{pageNumber}} of {{pageCount}}";
-    let newPageText = pageText;
-    // let newPageText = pageText.replace(
-    //   /\{\{(\w+)\}\}/g,
-    //   (match, p1) => pageVariables[p1]
-    // );
+    let newPageText = pageText.replace(/\{\{(\w+)\}\}/g, (match, p1:string) => {
+      return pageParameters[p1] || match;
+    });
     jsPdf.setPage(i);
     //添加水印文字
     let textWidth =
@@ -537,4 +537,38 @@ function getElementRect(window: any, document: any, element: any) {
     width: Number(box.width.toFixed(0)),
     height: Number(box.height.toFixed(0)),
   };
+}
+
+function dataURLtoBlob(dataurl: any) {
+  let arr = dataurl.split(','),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]),
+      n = bstr.length,
+      u8arr = new Uint8Array(n);
+  while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], {
+      type: mime
+  });
+}
+
+function downloadDataURL(document: any, imgData:any) {
+  let blob = dataURLtoBlob(imgData);
+  let objurl = URL.createObjectURL(blob);
+  let link = document.createElement("a");
+  link.download = "Report.png";
+  link.href = objurl;
+  link.click();
+}
+
+function downloadImageData(document: any, imageData:any) {
+  let cvs = document.createElement("canvas");
+  let ctx = cvs.getContext('2d');
+  cvs.width = imageData.width;
+  cvs.height = imageData.height;
+  ctx.putImageData(imageData, 0, 0);
+  let imgData = cvs.toDataURL("image/png");
+  downloadDataURL(document, imgData);
+  cvs = null;
 }

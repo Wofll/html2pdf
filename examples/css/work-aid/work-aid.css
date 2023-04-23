@@ -1,0 +1,118 @@
+/* Panel icons */
+.panel-icon_reagent::after {
+  background-image: url("../../images/work-aid/reagent.svg");
+}
+
+.panel-icon_carousel::after {
+  background-image: url("../../images/work-aid/carousel.svg");
+}
+
+.panel-icon_reservoir::after {
+  background-image: url("../../images/work-aid/reservoir.svg");
+}
+
+.panel-icon_manual::after {
+  background-image: url("../../images/work-aid/manual.svg");
+}
+
+.panel-icon_rv::after {
+  background-image: url("../../images/work-aid/rv.svg");
+}
+
+/* Reagent */
+.reagent__name {
+  width: 40%;
+}
+.reagent__prepare {
+  width: 45%;
+}
+.reagent__min-vol, .reagent__vol {
+  text-align: right !important;
+}
+th.reagent__min-vol {
+  line-height: 1.2em;
+}
+
+.reagent__manual-label {
+  font-weight: bold;
+}
+
+.icon--manual {
+  background-image: url("../../images/work-aid/manual.svg");
+}
+
+/* Carousel */
+.carousel__col-position {
+  width: 20%;
+}
+
+/* Reservoir */
+.reservoir-plate {
+  display: -webkit-box;
+  display: flex;
+  border: 1px solid #ced2d4;
+}
+
+.reservoir {
+  -webkit-box-flex: 1;
+  flex-grow: 1;
+  width: 20%;
+}
+
+.reservoir-spacer {
+  width: 1%;
+  border-left: 1px solid #ced2d4;
+  border-right: 1px solid #ced2d4;
+}
+
+.reservoir-without-reagent {
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+}
+
+.reservoir-placeholder {
+  -webkit-box-flex: 1;
+  flex-grow: 1;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+  background-color: rgba(206, 210, 212, 0.6);
+}
+
+.reservoir-location {
+  text-align: center;
+  background-color: #ced2d4;
+}
+
+.reservoir-well-coordinate {
+  text-align: center;
+  background-color: rgba(206, 210, 212, 0.6);
+}
+
+.reservoir-well-reagent {
+  box-sizing: border-box;
+  padding: 6px;
+}
+
+.reservoir-well-reagent div:not(:first-child) {
+  margin-top: 1em;
+}
+
+.reservoir-well-coordinate,
+.reservoir-well-reagent {
+  display: inline-block;
+  width: 50%;
+  vertical-align: top;
+}
+
+/* Reaction vessel */
+.rv-table tbody tr {
+  /* minimum height */
+  height: 4.5em;
+}

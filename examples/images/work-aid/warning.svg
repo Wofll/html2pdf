@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="24"
+     height="24"
+     viewBox="0 0 24 24">
+  <path d="M0,0H24V24H0Z"
+        fill="none" />
+  <path d="M1,21H23L12,2Zm12-3H11V16h2Zm0-4H11V10h2Z"
+        fill="#fbc02d" />
+  <path d="M0,0H2V4H0Z"
+        transform="translate(11 10)" />
+  <path d="M0,0H2V2H0Z"
+        transform="translate(11 16)" />
+</svg>

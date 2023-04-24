@@ -30,11 +30,11 @@
   text-align: center;
 }
 
-.logo {  
-    position: absolute;
-    top: 0px;
-    left: 10px;
-    width: 100px;
+.logo {
+  position: absolute;
+  top: 0px;
+  left: 10px;
+  width: 100px;
 }
 
 .full-width {
@@ -94,7 +94,7 @@
 .table-cover td {
   /* 12pt */
   font-size: 16px;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: "Times New Roman", Times, serif;
 }
 
 .table-level-lot-date {
@@ -121,13 +121,13 @@
   padding: 0px;
 }
 
-  .table-footer .page-1.trademarks {
-    display: block;
-  }
+.table-footer .page-1.trademarks {
+  display: block;
+}
 
-  .table-footer .trademarks {
-    display: none;
-  }
+.table-footer .trademarks {
+  display: none;
+}
 
 /* Notes*/
 .p2-header-line1 {
@@ -136,7 +136,7 @@
 
 .p2-header-line2 {
   font-size: 12px;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: "Times New Roman", Times, serif;
   margin-top: 10px;
 }
 
@@ -159,18 +159,18 @@
 
 /* Evaluation 3 */
 .p3-header {
-  font-family: 'Times New Roman', Times, serif;
+  font-family: "Times New Roman", Times, serif;
 }
 
 .p3-header-line1 {
   margin-top: 10px;
   font-size: 15px;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: "Times New Roman", Times, serif;
 }
 
 .p3-header-line2 {
   font-size: 12px;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: "Times New Roman", Times, serif;
   margin-top: 10px;
   margin-bottom: 10px;
 }
@@ -180,24 +180,24 @@
   border-collapse: collapse;
 }
 
-  .table-data-evaluation thead {
-    font-size: 12px !important;
-    background-color: #c0e8ff; /* ($iqap-blue, 100) */
-  }
+.table-data-evaluation thead {
+  font-size: 12px !important;
+  background-color: #c0e8ff; /* ($iqap-blue, 100) */
+}
 
-  .table-data-evaluation thead th,
-  .table-data-evaluation tbody .table-data-evaluation-subheader td {
-    font-size: 12px !important;
-    padding: 0.5em 0.2em;
-  }
+.table-data-evaluation thead th,
+.table-data-evaluation tbody .table-data-evaluation-subheader td {
+  font-size: 12px !important;
+  padding: 0.5em 0.2em;
+}
 
-  .table-data-evaluation tbody td {
-    padding: 0.5em 0.2em;
-  }
+.table-data-evaluation tbody td {
+  padding: 0.5em 0.2em;
+}
 
-  .table-data-evaluation tbody {
-    font-size: 11px !important;
-  }
+.table-data-evaluation tbody {
+  font-size: 11px !important;
+}
 
 .table-data-evaluation td,
 .table-data-evaluation th {
@@ -242,7 +242,7 @@
 
 .p4-header-line2 {
   font-size: 12px;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: "Times New Roman", Times, serif;
   margin-top: 10px;
 }
 
@@ -276,15 +276,15 @@
   border-collapse: collapse;
 }
 
-  .table-chart td {
-    box-sizing: border-box;
-    width: 36px;
-    min-width: 36px;
-    max-width: 36px;
-    height: 20px;
-    min-height: 20px;
-    padding: 0;
-  }
+.table-chart td {
+  box-sizing: border-box;
+  width: 36px;
+  min-width: 36px;
+  max-width: 36px;
+  height: 20px;
+  min-height: 20px;
+  padding: 0;
+}
 
 .table-chart {
   position: relative;
@@ -301,17 +301,17 @@
   font-size: 8px;
 }
 
-  .chart-x span {
-    display: inline-block;
-    width: 43px;
-    margin-left: -10px;
-  }
+.chart-x span {
+  display: inline-block;
+  width: 43px;
+  margin-left: -10px;
+}
 
-  .chart-y > div {
-    box-sizing: border-box;
-    height: 20px;
-    margin-left: -60px;
-  }
+.chart-y > div {
+  box-sizing: border-box;
+  height: 20px;
+  margin-left: -60px;
+}
 
 .chart-left {
   margin-top: 8px;

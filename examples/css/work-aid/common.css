@@ -53,7 +53,8 @@ body {
 }
 
 /* List */
-ol, ul {
+ol,
+ul {
   margin: 0;
   padding: 0 0 0 1em;
 }
@@ -224,7 +225,7 @@ ol, ul {
 }
 
 .icon--ended {
-  background-image: url("../../images/work-aid/ended.svg")
+  background-image: url("../../images/work-aid/ended.svg");
 }
 
 /* Message box */

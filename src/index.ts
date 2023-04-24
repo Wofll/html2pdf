@@ -1,19 +1,19 @@
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { PageParameter } from "model/page-parameter";
+import { PrintDocument } from "model/print-document";
 
-async function html2pdf(
-  htmlBody: any,
-  htmlHeader: any,
-  htmlFooter: any
-): Promise<void> {
+async function html2pdf(printDocument: PrintDocument, fileName: string): Promise<void> {
   let jsPdf = new jsPDF({
     orientation: "landscape",
     unit: "px", //Measurement unit (base unit) to be used when coordinates are specified.Possible values are "pt" (points), "mm", "cm", "in", "px", "pc", "em" or "ex".
     format: "a4", //Default is "a4". If you want to use your own format just pass instead of one of the above predefined formats the size as an number-array, e.g. [595.28, 841.89]
     hotfixes: ["px_scaling"], // Note that in order to get the correct scaling for "px" units, you need to enable the hotfix "px_scaling" by setting options.hotfixes = ["px_scaling"].
   });
-  var bodyInnerHTML = htmlBody.innerHTML;
+  const htmlBody = printDocument.content.html;
+  const htmlHeader = printDocument.header.html;
+  const htmlFooter = printDocument.footer.html;
+  const bodyInnerHTML = htmlBody.innerHTML;
   //a4纸的尺寸pt:[595.28,841.89], px:794px*1123px
   // var pageWidth = 841.89;
   // var pageHeight = 595.28;
@@ -24,7 +24,7 @@ async function html2pdf(
   // let contentWidth = htmlBody.offsetWidth;
   let contentHeight = htmlBody.offsetHeight;
 
-  let scale = 3;
+  const scale = 3;
   // html2canvas配置项
   const options = {
     allowTaint: true,
@@ -36,15 +36,17 @@ async function html2pdf(
     // width: contentWidth, // canvas宽度
     // height: contentHeight
   };
-  let margin = {
-    left: 36,
-    top: 36,
-    right: 36,
-    bottom: 24,
-  };
+
+  const margin = printDocument.margin;
+  // const margin = {
+  //   left: 36,
+  //   top: 36,
+  //   right: 36,
+  //   bottom: 24,
+  // };
 
   // let headerContentWidth = htmlHeader.offsetWidth;
-  let headerContentHeight = Number(htmlHeader.offsetHeight);
+  let headerHeight = Number(htmlHeader.offsetHeight);
   // let headerRect = getElementRect(window, document, htmlHeader);
   // let headerTopOffset = headerRect.top;
   // let headerZoomRatio = 1;
@@ -54,30 +56,30 @@ async function html2pdf(
   let headerContext = headerCanvas.getContext("2d", {
     willReadFrequently: true,
   });
-  // headerZoomRatio = headerCanvas.height / scale / headerContentHeight;
+  // headerZoomRatio = headerCanvas.height / scale / headerHeight;
   headerPageImageData = headerContext.getImageData(
     0,
     0,
     (headerWidth - offsetWidth) * scale,
-    headerContentHeight * scale
+    headerHeight * scale
   );
   jsPdf.addImage(
     headerPageImageData,
     "JPEG",
     margin.left,
-    36,
+    margin.top,
     headerWidth - offsetWidth,
-    headerContentHeight,
+    headerHeight,
     "header",
     "FAST"
   ); //alias参数: 给别名header, 可以重用页眉图片.
 
   let footerWidth = pageWidth - margin.left - margin.right;
-  let footerHeight = 50;
+  let footerHeight = Number(htmlFooter.offsetHeight);;
 
   const footerCanvas = await getElementCanvas(htmlFooter, options);
   // let footerContentWidth = htmlFooter.offsetWidth;
-  let footerContentHeight = htmlFooter.offsetHeight;
+  // let footerContentHeight = htmlFooter.offsetHeight;
   // let footerRect = getElementRect(window, document, htmlFooter);
   // let footerTopOffset = headerRect.top;
   // let footerZoomRatio = 1;
@@ -85,23 +87,62 @@ async function html2pdf(
   let footerContext = footerCanvas.getContext("2d", {
     willReadFrequently: true,
   });
-  // footerZoomRatio = footerCanvas.height / scale / footerContentHeight;
+  // footerZoomRatio = footerCanvas.height / scale / footerHeight;
   footerPageImageData = footerContext.getImageData(
     0,
     0,
     (footerWidth - offsetWidth) * scale,
-    footerContentHeight * scale
+    footerHeight * scale
   );
 
-  let bodyMarginTop = margin.top + headerContentHeight;
+  let footerText = printDocument.footer.text;
+  let pageNumberHeight = 0;  
+  let pageNumberY = pageHeight - margin.bottom;
+  if(footerText && printDocument.footer.text.newLine)
+  {
+    var pageNumberOptions = {
+      font: footerText.fontFamily,
+      fontSize: footerText.fontSize,
+      maxWidth: footerWidth,
+      scaleFactor: jsPdf.internal.scaleFactor
+    };
+    var dimensions = jsPdf.getTextDimensions(printDocument.footer.text.rightText, pageNumberOptions);
+
+    //默认页码上下间距
+    const defaultLineSpacing = 5; 
+    let marginTop = 0;
+    if(printDocument.footer?.text?.margin?.top)
+    {
+      marginTop = printDocument.footer?.text?.margin?.top;
+    }
+    else
+    {
+      marginTop = defaultLineSpacing;
+    }
+
+    let marginBottom = 0;
+    if(printDocument.footer?.text?.margin?.bottom)
+    {
+      marginBottom = printDocument.footer?.text?.margin?.bottom;
+    }
+    else
+    {
+      marginBottom = defaultLineSpacing;
+    }
+
+    pageNumberHeight = Number(dimensions.h.toFixed(0)) + marginTop + marginBottom;
+    pageNumberY = pageHeight - margin.bottom - Number(dimensions.h.toFixed(0)) - marginTop;
+  }
+
+  let bodyMarginTop = margin.top + headerHeight;
   let bodyMarginBottom = margin.bottom + footerHeight;
   // let imgWidth = pageWidth - margin.left - margin.right;
-  let imgHeight = pageHeight - bodyMarginTop - bodyMarginBottom;
+  let imgHeight = pageHeight - bodyMarginTop - bodyMarginBottom - pageNumberHeight;
 
   const bodyCanvas = await getElementCanvas(htmlBody, options);
   // 返回图片的二进制数据
-  // let bodyImageData = bodyCanvas.toDataURL("image/png");
-  // downloadDataURL(bodyImageData);
+  let bodyImageData = bodyCanvas.toDataURL("image/png");
+  downloadDataURL(bodyImageData, fileName + ".png");
 
   // let pageIndex = 0;
   // let pageStartPosition = 0;
@@ -147,8 +188,8 @@ async function html2pdf(
       (currentPageHeight + pageOffsetX) * scale
     );
 
-    if (currentPageIndex === 1) {
-      downloadImageData(currentPageImageData);
+    if (currentPageIndex === 7) {
+      downloadImageData(currentPageImageData, fileName + ".png");
     }
 
     if (currentPageIndex > 1) {
@@ -162,7 +203,7 @@ async function html2pdf(
       margin.left,
       36,
       headerWidth - 2,
-      headerContentHeight,
+      headerHeight,
       "header",
       "FAST"
     );
@@ -184,9 +225,9 @@ async function html2pdf(
       footerPageImageData,
       "JPEG",
       margin.left,
-      pageHeight - footerHeight - margin.bottom,
+      pageHeight - margin.bottom - pageNumberHeight - footerHeight,
       footerWidth - 2,
-      footerContentHeight,
+      footerHeight,
       "footer",
       "FAST"
     ); //alias参数: 给别名footer, 可以重用页脚图片.
@@ -243,22 +284,25 @@ async function html2pdf(
       pageCount: pageCount,
     };
     const pageText = "Page {{pageNumber}} of {{pageCount}}";
-    let newPageText = pageText.replace(/\{\{(\w+)\}\}/g, (match, p1:string) => {
-      return pageParameters[p1] || match;
-    });
+    let newPageText = pageText.replace(
+      /\{\{(\w+)\}\}/g,
+      (match, p1: string) => {
+        return pageParameters[p1] || match;
+      }
+    );
     jsPdf.setPage(i);
-    //添加水印文字
+    //添加页码
     let textWidth =
       (jsPdf.getStringUnitWidth(newPageText) * pageNumberFontSize) /
       jsPdf.internal.scaleFactor;
     let pageNumberX = pageWidth - margin.right - textWidth - 5;
-    jsPdf.text(newPageText, pageNumberX, pageHeight - margin.bottom - 10);
+    jsPdf.text(newPageText, pageNumberX, pageNumberY);
   }
   //还原对body的InnerHTML的修改, 超大元素分页是缓存了分页位置信息.
   htmlBody.innerHTML = bodyInnerHTML;
 
   //保存pdf.
-  jsPdf.save("Test.pdf");
+  jsPdf.save(fileName);
 }
 
 export default html2pdf;
@@ -469,6 +513,12 @@ function getPageElementPosition(
   }
 
   let leftHeight = pageStartPosition + imgHeight - elementX;
+  if( pageCurrentIndex > 1)
+  {
+    //该元素已经被拆分过了, 新页剩余空间为整页的高度
+    leftHeight = imgHeight;
+  }
+
   let lineHeight = Number(
     window.getComputedStyle(element).lineHeight.replace("px", "")
   );
@@ -541,21 +591,21 @@ function dataURLtoBlob(dataurl: any) {
   });
 }
 
-function downloadDataURL(imgData:any) {
+function downloadDataURL(imgData:any, fileName:string) {
   let blob = dataURLtoBlob(imgData);
   let objurl = URL.createObjectURL(blob);
   let link = document.createElement("a");
-  link.download = "Report.png";
+  link.download = fileName;
   link.href = objurl;
   link.click();
 }
 
-function downloadImageData(imageData:any) {
+function downloadImageData(imageData:any, fileName:string) {
   let cvs = document.createElement("canvas");
   let ctx = cvs.getContext('2d');
   cvs.width = imageData.width;
   cvs.height = imageData.height;
   ctx?.putImageData(imageData, 0, 0);
   let imgData = cvs.toDataURL("image/png");
-  downloadDataURL(imgData);
+  downloadDataURL(imgData, fileName);
 }

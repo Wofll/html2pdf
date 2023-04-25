@@ -2,9 +2,12 @@
 #outer {
   width: 1123px;
   font-family: arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6em;
 }
 
 #doc-header {
+  position: relative;
   margin: 0px 36px 0px 36px;
   height: 72px;
 }
@@ -18,7 +21,6 @@
 }
 
 /* Common */
-
 .bold {
   font-weight: bold;
 }

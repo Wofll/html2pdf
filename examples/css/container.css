@@ -3,29 +3,8 @@
   padding: 0px 0px 0px 0px;
   border: 1px solid #000;
   margin: 20px;
-  font-size: 14px;
-  font-family: arial, sans-serif;
-}
-
-#doc-header {
-  -webkit-font-smoothing: antialiased;
   color: #000;
-  line-height: 1.6em;
-  position: relative;
-}
-
-#doc-body {
   -webkit-font-smoothing: antialiased;
-  color: #000;
-  line-height: 1.6em;
-  position: relative;
-}
-
-#doc-footer {
-  -webkit-font-smoothing: antialiased;
-  color: #000;
-  line-height: 1.6em;
-  position: relative;
 }
 
 #canvas-outer {

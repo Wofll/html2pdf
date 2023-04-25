@@ -1,4 +1,5 @@
 #outer {
+  float: left;
   padding: 0px 0px 0px 0px;
   border: 1px solid #000;
   margin: 20px;
@@ -6,25 +7,45 @@
 }
 
 #doc-header {
-  font-family: sans-serif;
   -webkit-font-smoothing: antialiased;
   color: #000;
   line-height: 1.6em;
   position: relative;
+  font-family: arial, sans-serif;
 }
 
 #doc-body {
-  font-family: sans-serif;
   -webkit-font-smoothing: antialiased;
   color: #000;
   line-height: 1.6em;
   position: relative;
+  font-family: arial, sans-serif;
 }
 
 #doc-footer {
-  font-family: sans-serif;
   -webkit-font-smoothing: antialiased;
   color: #000;
   line-height: 1.6em;
   position: relative;
+  font-family: arial, sans-serif;
+}
+
+#canvas-outer {
+  float: right;
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #000;
+  margin: 20px;
+  width: 1123px;
+}
+
+#canvas-header {
+  margin: 0px 36px 0px 36px;
+}
+
+#canvas-body {
+  margin: 0px 36px 0px 36px;
+}
+
+#canvas-footer {
+  margin: 0px 36px 0px 36px;
 }

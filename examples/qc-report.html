@@ -1,52 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Html2Pdf - QC Report</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link rel="stylesheet" href="./css/container.css" />
-    <link rel="stylesheet" href="./css/qc-report/qc-report.css" />
-  </head>
 
-  <body>
-    <script type="text/javascript" src="../dist/html2pdf.js"></script>
-    <script type="text/javascript">
-      function generatePdf() {
-        let htmlBody = document.getElementById('doc-body');
-        let htmlHeader = document.getElementById('doc-header');
-        let htmlFooter = document.getElementById('doc-footer');
-        let printDocument = {
-          content: {
-            html: htmlBody
-          },
-          header: {
-            html: htmlHeader,
-            height: 110
-          },
-          footer: {
-            html: htmlFooter,
-            text: { rightText: "Page {{pageNumber}} of {{pageCount}}", newLine: true },
-            height: 50
-          },
-          margin: {
-            left: 36,
-            top: 36,
-            right: 36,
-            bottom: 36
-          }
-        };
-        var myDate = new Date();
-        html2pdf(printDocument, "QC Report_"+myDate.getTime()+".pdf");
-      }
-    </script>
+<head>
+  <title>Html2Pdf - QC Report</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <link rel="stylesheet" href="./css/container.css" />
+  <link rel="stylesheet" href="./css/qc-report/qc-report.css" />
+</head>
 
-    <div>
-      <p>
-        <button class="btn" onclick="generatePdf()">Download PDF</button>
-      </p>
-    </div>
-    <div id="container"></div>
+<body>
+  <script type="text/javascript" src="../dist/html2pdf.js"></script>
+  <script type="text/javascript">
+    function generatePdf() {
+      let htmlBody = document.getElementById('doc-body');
+      let htmlHeader = document.getElementById('doc-header');
+      let htmlFooter = document.getElementById('doc-footer');
+      let printDocument = {
+        content: {
+          html: htmlBody
+        },
+        header: {
+          html: htmlHeader,
+          height: 110
+        },
+        footer: {
+          html: htmlFooter,
+          text: { rightText: "Page {{pageNumber}} of {{pageCount}}", newLine: true },
+          height: 50
+        },
+        margin: {
+          left: 36,
+          top: 36,
+          right: 36,
+          bottom: 36
+        }
+      };
+      var myDate = new Date();
+      html2pdf(printDocument, "QC Report_" + myDate.getTime() + ".pdf");
+    }
+  </script>
+
+  <div>
+    <p>
+      <button class="btn" onclick="generatePdf()">Download PDF</button>
+    </p>
+  </div>
+  <div id="container">
     <div id="outer">
       <div id="doc-header">
         <!-- Evaluation -->
@@ -1204,5 +1205,12 @@
         </table>
       </div>
     </div>
-  </body>
+    <div id="canvas-outer">
+      <div id="canvas-header"></div>
+      <div id="canvas-body"></div>
+      <div id="canvas-footer"></div>
+    </div>
+  </div>
+</body>
+
 </html>

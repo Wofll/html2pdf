@@ -1,14 +1,3 @@
-/* COMMON */
-
-html,
-body {
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 1.5em;
-  letter-spacing: 0.03125em;
-  word-break: break-word;
-}
-
 /* Table in panel */
 .panel table {
   width: 100%;

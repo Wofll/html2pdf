@@ -1,52 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Html2Pdf - Work Aid</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link rel="stylesheet" href="./css/container.css" />
-    <link rel="stylesheet" href="./css/work-aid/common.css" />
-    <link rel="stylesheet" href="./css/work-aid/common.en-US.css" />
-    <link rel="stylesheet" href="./css/work-aid/work-aid.css" />
-  </head>
 
-  <body>
-    <script type="text/javascript" src="../dist/html2pdf.js"></script>
-    <script type="text/javascript">
-      function generatePdf() {
-        let htmlBody = document.getElementById('doc-body');
-        let htmlHeader = document.getElementById('doc-header');
-        let htmlFooter = document.getElementById('doc-footer');
-        let printDocument = {
-          content: {
-            html: htmlBody
-          },
-          header: {
-            html: htmlHeader,
-            height: 110
-          },
-          footer: {
-            html: htmlFooter,
-            height: 50
-          },
-          margin: {
-            left: 36,
-            top: 36,
-            right: 36,
-            bottom: 36
-          }
-        };
-        html2pdf(printDocument, "Work Aid.pdf");
-      }
-    </script>
+<head>
+  <title>Html2Pdf - Work Aid</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <link rel="stylesheet" href="./css/container.css" />
+  <link rel="stylesheet" href="./css/work-aid/common.css" />
+  <link rel="stylesheet" href="./css/work-aid/common.en-US.css" />
+  <link rel="stylesheet" href="./css/work-aid/work-aid.css" />
+</head>
 
-    <div>
-      <p>
-        <button class="btn" onclick="generatePdf()">Download PDF</button>
-      </p>
-    </div>
-    <div id="container"></div>
+<body>
+  <script type="text/javascript" src="../dist/html2pdf.js"></script>
+  <script type="text/javascript">
+    function generatePdf() {
+      let htmlBody = document.getElementById('doc-body');
+      let htmlHeader = document.getElementById('doc-header');
+      let htmlFooter = document.getElementById('doc-footer');
+      let printDocument = {
+        content: {
+          html: htmlBody
+        },
+        header: {
+          html: htmlHeader,
+          height: 110
+        },
+        footer: {
+          html: htmlFooter,
+          height: 50
+        },
+        margin: {
+          left: 36,
+          top: 36,
+          right: 36,
+          bottom: 36
+        }
+      };
+      var myDate = new Date();
+      html2pdf(printDocument, "Work Aid_" + myDate.getTime() + ".pdf");
+    }
+  </script>
+
+  <div>
+    <p>
+      <button class="btn" onclick="generatePdf()">Download PDF</button>
+    </p>
+  </div>
+  <div id="container">
     <div id="outer">
       <div id="doc-header">
         <mat-card class="mat-card header">
@@ -57,9 +59,7 @@
                 <circle cx="50" cy="50" r="50" fill="#156cae" />
                 <path
                   d="M19.47,42.254c0-.283.01-.53.029-.781L19.479,4.91H16.831V.115H25.72V41.936h0c0,.156,0,.267,0,.318a5.473,5.473,0,1,0,10.944,0c0-.038,0-.153,0-.318h0L36.655,4.91V.115h8.722V4.91H42.908l-.025,36.579c.007.238.025.469.025.766a11.721,11.721,0,1,1-23.438,0Zm8.4-1.334V20.342h6.713V40.92s.358,4.061-3.358,4.061C27.493,44.982,27.87,40.92,27.87,40.92ZM44.862,43.9V36.879a5.362,5.362,0,0,0,3.351,1.167,5.517,5.517,0,0,0,5.462-5.564c0-.035,0-.15,0-.313L53.669,4.8V0H62.22V4.8h-2.3L59.9,31.726c0,.084.006.163.01.246.006.16.016.324.016.51a11.824,11.824,0,0,1-11.71,11.911A11.5,11.5,0,0,1,44.862,43.9ZM2.285,32.483c0-.2.006-.376.016-.55,0-.069.007-.139.007-.209L2.285,4.8H0V0H8.536V4.8L8.529,32.169v.313a5.519,5.519,0,0,0,5.462,5.564,5.386,5.386,0,0,0,3.352-1.163V43.9a11.517,11.517,0,0,1-3.352.5A11.823,11.823,0,0,1,2.285,32.483Zm43.5,1.763a4.6,4.6,0,0,1-.9-3.1V14.217H51.6V31.146a4.641,4.641,0,0,1-.916,3.106,3.592,3.592,0,0,1-4.9-.006Zm-34.261.006a4.618,4.618,0,0,1-.916-3.106V14.217h6.716V31.146a4.622,4.622,0,0,1-.9,3.1,3.133,3.133,0,0,1-2.455.967A3.131,3.131,0,0,1,11.523,34.252Z"
-                  transform="translate(18.316 28.674)"
-                  fill="#fff"
-                />
+                  transform="translate(18.316 28.674)" fill="#fff" />
               </svg>
             </mat-icon>
           </vision-batch-run-status-icon>
@@ -80,16 +80,16 @@
           <div class="panel-title">SECTIONS</div>
           <table cellpadding="0" cellspacing="0">
             <tbody>
-              <tr>
+              <tr id="Section row1">
                 <td>3. End Repair</td>
               </tr>
-              <tr>
+              <tr id="Section row2">
                 <td>4. Atailing</td>
               </tr>
-              <tr>
+              <tr id="Section row3">
                 <td>5. Ligation</td>
               </tr>
-              <tr>
+              <tr id="Section row4">
                 <td>6. Library Amplification</td>
               </tr>
             </tbody>
@@ -120,22 +120,22 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr id="Reagent row1">
                 <td>AMPureXP</td>
                 <td>Let the AMPure XP beads come to room temperature for at least 30 minutes.</td>
                 <td class="reagent__min-vol">2800.0</td>
               </tr>
-              <tr>
+              <tr id="Reagent row2">
                 <td>70% EtOH</td>
                 <td>Prepare fresh 70% EtOH by diluted 100% EtOH in nuclease-free water.</td>
                 <td class="reagent__min-vol">2600.0</td>
               </tr>
-              <tr>
+              <tr id="Reagent row3">
                 <td>H2O</td>
                 <td>Nuclease-free water</td>
                 <td class="reagent__min-vol">1452.0</td>
               </tr>
-              <tr>
+              <tr id="Reagent row4">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--manual"></div>
@@ -147,7 +147,7 @@
                 <td></td>
                 <td class="reagent__min-vol">309.9</td>
               </tr>
-              <tr>
+              <tr id="Reagent row5">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--manual"></div>
@@ -159,7 +159,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">25.0</td>
               </tr>
-              <tr>
+              <tr id="Reagent row6">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--manual"></div>
@@ -171,7 +171,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">5.0</td>
               </tr>
-              <tr>
+              <tr id="Reagent row7">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -184,7 +184,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">15.0</td>
               </tr>
-              <tr>
+              <tr id="Reagent row8">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--manual"></div>
@@ -196,7 +196,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">43.9</td>
               </tr>
-              <tr>
+              <tr id="Reagent row9">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--manual"></div>
@@ -208,7 +208,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">7.1</td>
               </tr>
-              <tr>
+              <tr id="Reagent row10">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -221,7 +221,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">4.4</td>
               </tr>
-              <tr>
+              <tr id="Reagent row11">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -234,7 +234,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">8.8</td>
               </tr>
-              <tr>
+              <tr id="Reagent row12">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -247,7 +247,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">9.7</td>
               </tr>
-              <tr>
+              <tr id="Reagent row13">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--manual"></div>
@@ -259,7 +259,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">50.1</td>
               </tr>
-              <tr>
+              <tr id="Reagent row14">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -272,7 +272,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">5.0</td>
               </tr>
-              <tr>
+              <tr id="Reagent row15">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--manual"></div>
@@ -284,7 +284,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">2.5</td>
               </tr>
-              <tr>
+              <tr id="Reagent row16">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--manual"></div>
@@ -296,7 +296,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">6.3</td>
               </tr>
-              <tr>
+              <tr id="Reagent row17">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--manual"></div>
@@ -308,7 +308,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">6.3</td>
               </tr>
-              <tr>
+              <tr id="Reagent row18">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -321,7 +321,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">45.5</td>
               </tr>
-              <tr>
+              <tr id="Reagent row19">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--manual"></div>
@@ -333,7 +333,7 @@
                 <td>Thaw on ice. Dilute the SureSelect Adaptor Oligo Mix 1:10 in nuclease-free water.</td>
                 <td class="reagent__min-vol">45.5</td>
               </tr>
-              <tr>
+              <tr id="Reagent row20">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -346,7 +346,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">6.9</td>
               </tr>
-              <tr>
+              <tr id="Reagent row21">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -359,7 +359,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">6.9</td>
               </tr>
-              <tr>
+              <tr id="Reagent row22">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -372,7 +372,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">6.9</td>
               </tr>
-              <tr>
+              <tr id="Reagent row23">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -385,7 +385,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">6.9</td>
               </tr>
-              <tr>
+              <tr id="Reagent row24">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -398,7 +398,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">6.9</td>
               </tr>
-              <tr>
+              <tr id="Reagent row25">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -411,7 +411,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">6.9</td>
               </tr>
-              <tr>
+              <tr id="Reagent row26">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -424,7 +424,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">6.9</td>
               </tr>
-              <tr>
+              <tr id="Reagent row27">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -437,7 +437,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">6.9</td>
               </tr>
-              <tr>
+              <tr id="Reagent row28">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -450,7 +450,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">6.9</td>
               </tr>
-              <tr>
+              <tr id="Reagent row29">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -463,7 +463,7 @@
                 <td>Thaw on ice.</td>
                 <td class="reagent__min-vol">6.9</td>
               </tr>
-              <tr>
+              <tr id="Reagent row30">
                 <td>
                   <div class="message-box">
                     <div class="icon icon--warning"></div>
@@ -498,5 +498,13 @@
         </table>
       </div>
     </div>
-  </body>
+
+    <div id="canvas-outer">
+      <div id="canvas-header"></div>
+      <div id="canvas-body"></div>
+      <div id="canvas-footer"></div>
+    </div>
+  </div>
+</body>
+
 </html>

@@ -101,12 +101,12 @@ body {
 
 .table-header th {
   font-size: 13px;
-  font-family: Arial, Times, serif;
+  font-family: arial, sans-serif;
 }
 
 .table-header td {
   font-size: 13px;
-  font-family: Arial, Times, serif;
+  font-family: arial, sans-serif;
 }
 
 .table-cover th {
@@ -116,13 +116,13 @@ body {
   font-weight: normal;
   text-align: left;
   vertical-align: top;
-  font-family: Arial, Times, serif;
+  font-family: arial, sans-serif;
 }
 
 .table-cover td {
   /* 12pt */
   font-size: 16px;
-  font-family: "Times New Roman", Times, serif;
+  font-family: arial, sans-serif;
 }
 
 .table-level-lot-date {
@@ -165,7 +165,7 @@ body {
 
 .p2-header-line2 {
   font-size: 12px;
-  font-family: "Times New Roman", Times, serif;
+  font-family: arial, sans-serif;
   margin-top: 10px;
 }
 
@@ -189,18 +189,18 @@ body {
 
 /* Evaluation 3 */
 .p3-header {
-  font-family: "Times New Roman", Times, serif;
+  font-family: arial, sans-serif;
 }
 
 .p3-header-line1 {
   margin-top: 10px;
   font-size: 15px;
-  font-family: "Times New Roman", Times, serif;
+  font-family: arial, sans-serif;
 }
 
 .p3-header-line2 {
   font-size: 12px;
-  font-family: "Times New Roman", Times, serif;
+  font-family: arial, sans-serif;
   margin-top: 10px;
   margin-bottom: 10px;
 }
@@ -273,7 +273,7 @@ body {
 
 .p4-header-line2 {
   font-size: 12px;
-  font-family: "Times New Roman", Times, serif;
+  font-family: arial, sans-serif;
   margin-top: 10px;
 }
 

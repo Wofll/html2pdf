@@ -1,6 +1,11 @@
 /* Print margin */
 #outer {
   width: 1123px;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.5em;
+  letter-spacing: 0.03125em;
+  word-break: break-word;
 }
 
 #doc-header {
@@ -14,6 +19,7 @@
 
 #doc-footer {
   margin: 0px 36px 0px 36px;
+  height: 110px;
 }
 /* Panel icons */
 .panel-icon_reagent::after {
@@ -57,76 +63,6 @@ th.reagent__min-vol {
 
 .icon--manual {
   background-image: url("../../images/work-aid/manual.svg");
-}
-
-/* Carousel */
-.carousel__col-position {
-  width: 20%;
-}
-
-/* Reservoir */
-.reservoir-plate {
-  display: -webkit-box;
-  display: flex;
-  border: 1px solid #ced2d4;
-}
-
-.reservoir {
-  -webkit-box-flex: 1;
-  flex-grow: 1;
-  width: 20%;
-}
-
-.reservoir-spacer {
-  width: 1%;
-  border-left: 1px solid #ced2d4;
-  border-right: 1px solid #ced2d4;
-}
-
-.reservoir-without-reagent {
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  flex-direction: column;
-}
-
-.reservoir-placeholder {
-  -webkit-box-flex: 1;
-  flex-grow: 1;
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-pack: center;
-  justify-content: center;
-  -webkit-box-align: center;
-  align-items: center;
-  background-color: rgba(206, 210, 212, 0.6);
-}
-
-.reservoir-location {
-  text-align: center;
-  background-color: #ced2d4;
-}
-
-.reservoir-well-coordinate {
-  text-align: center;
-  background-color: rgba(206, 210, 212, 0.6);
-}
-
-.reservoir-well-reagent {
-  box-sizing: border-box;
-  padding: 6px;
-}
-
-.reservoir-well-reagent div:not(:first-child) {
-  margin-top: 1em;
-}
-
-.reservoir-well-coordinate,
-.reservoir-well-reagent {
-  display: inline-block;
-  width: 50%;
-  vertical-align: top;
 }
 
 /* Reaction vessel */

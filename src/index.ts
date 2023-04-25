@@ -20,7 +20,7 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   // 注意: 计算位置必须取整数, 不然计算表格时算法会出现下一行的开始位置小于上一行的结束位置, 造成算法错乱.
   let pageWidth = 1123;
   let pageHeight = 794;
-  let offsetWidth = 4; //截图时去除容器的外层边框, 否则会把容器的外层边线也复制到PDF中.
+  let offsetWidth = 2; //截图时去除容器的外层边框, 否则会把容器的外层边线也复制到PDF中.
   // let contentWidth = htmlBody.offsetWidth;
   let contentHeight = htmlBody.offsetHeight;
 
@@ -53,9 +53,14 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   let headerWidth = pageWidth - margin.left - margin.right;
   let headerPageImageData;
   let headerCanvas = await getElementCanvas(htmlHeader, options);
+  
+  let headerCanvasContainer = document.getElementById("canvas-header");
+  headerCanvasContainer?.appendChild(headerCanvas);
+
   let headerContext = headerCanvas.getContext("2d", {
     willReadFrequently: true,
   });
+
   // headerZoomRatio = headerCanvas.height / scale / headerHeight;
   headerPageImageData = headerContext.getImageData(
     0,
@@ -78,6 +83,10 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   let footerHeight = Number(htmlFooter.offsetHeight);;
 
   const footerCanvas = await getElementCanvas(htmlFooter, options);
+  
+  let footerCanvasContainer = document.getElementById("canvas-footer");
+  footerCanvasContainer?.appendChild(footerCanvas);
+
   // let footerContentWidth = htmlFooter.offsetWidth;
   // let footerContentHeight = htmlFooter.offsetHeight;
   // let footerRect = getElementRect(window, document, htmlFooter);
@@ -140,9 +149,13 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   let imgHeight = pageHeight - bodyMarginTop - bodyMarginBottom - pageNumberHeight;
 
   const bodyCanvas = await getElementCanvas(htmlBody, options);
+  
+  let bodyCanvasContainer = document.getElementById("canvas-body");
+  bodyCanvasContainer?.appendChild(bodyCanvas);
+
   // 返回图片的二进制数据
-  let bodyImageData = bodyCanvas.toDataURL("image/png");
-  downloadDataURL(bodyImageData, fileName + ".png");
+  // let bodyImageData = bodyCanvas.toDataURL("image/png");
+  // downloadDataURL(bodyImageData, fileName + ".png");
 
   // let pageIndex = 0;
   // let pageStartPosition = 0;
@@ -188,8 +201,9 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
       (currentPageHeight + pageOffsetX) * scale
     );
 
-    if (currentPageIndex === 7) {
+    if (currentPageIndex === 100) {
       downloadImageData(currentPageImageData, fileName + ".png");
+      downloadImageData(footerPageImageData, fileName + "_footer.png");
     }
 
     if (currentPageIndex > 1) {

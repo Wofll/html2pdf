@@ -8,7 +8,6 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <link rel="stylesheet" href="./css/container.css" />
   <link rel="stylesheet" href="./css/work-aid/common.css" />
-  <link rel="stylesheet" href="./css/work-aid/common.en-US.css" />
   <link rel="stylesheet" href="./css/work-aid/work-aid.css" />
 </head>
 
@@ -31,11 +30,15 @@
           html: htmlFooter,
           height: 50
         },
-        margin: {
-          left: 36,
-          top: 36,
-          right: 36,
-          bottom: 36
+        printOptions: {
+          paperSize: "a4",
+          orientation: "portrait",
+          margin: {
+            left: 36,
+            top: 36,
+            right: 36,
+            bottom: 36
+          }
         }
       };
       var myDate = new Date();

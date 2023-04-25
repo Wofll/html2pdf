@@ -1,5 +1,5 @@
 import { PaperSize } from "./paper-size";
 
 export const papers: PaperSize = {
-  a4: { name: "A4", height: 841.89, width: 595.28 }, //px
+  a4: { name: "a4", height: 1123, width: 794 }, //px
 };

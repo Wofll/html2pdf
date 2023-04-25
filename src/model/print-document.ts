@@ -1,10 +1,10 @@
 import { PrintContent } from "./print-content";
-import { PrintMargin } from "./print-margin";
+import { PrintOptions } from "./print-options";
 
 export interface PrintDocument {
   content: PrintContent;
   header: PrintContent;
   footer: PrintContent;
-  margin: PrintMargin;
+  printOptions: PrintOptions;
   fileName: string;
 }

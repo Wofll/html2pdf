@@ -1,4 +1,4 @@
 export enum PaperOrientation {
-    Portrait = 0,
-    Landscape = 1
+    Portrait = 'portrait',
+    Landscape = 'landscape'
 }

@@ -1,14 +1,18 @@
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import { PageParameter } from "model/page-parameter";
-import { PrintDocument } from "model/print-document";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import {PageParameter} from 'model/page-parameter';
+import {PrintDocument} from 'model/print-document';
+import {papers} from 'model/papers';
+import {PaperOrientation} from 'model/paper-orientation';
 
 async function html2pdf(printDocument: PrintDocument, fileName: string): Promise<void> {
+  const paperName = printDocument.printOptions.paperSize ?? 'a4';
+  const orientation = printDocument.printOptions.orientation === 'landscape' ? 'landscape' : 'portrait';
   let jsPdf = new jsPDF({
-    orientation: "landscape",
-    unit: "px", //Measurement unit (base unit) to be used when coordinates are specified.Possible values are "pt" (points), "mm", "cm", "in", "px", "pc", "em" or "ex".
-    format: "a4", //Default is "a4". If you want to use your own format just pass instead of one of the above predefined formats the size as an number-array, e.g. [595.28, 841.89]
-    hotfixes: ["px_scaling"], // Note that in order to get the correct scaling for "px" units, you need to enable the hotfix "px_scaling" by setting options.hotfixes = ["px_scaling"].
+    orientation: orientation,
+    unit: 'px', //Measurement unit (base unit) to be used when coordinates are specified.Possible values are "pt" (points), "mm", "cm", "in", "px", "pc", "em" or "ex".
+    format: paperName, //Default is "a4". If you want to use your own format just pass instead of one of the above predefined formats the size as an number-array, e.g. [595.28, 841.89]
+    hotfixes: ['px_scaling'] // Note that in order to get the correct scaling for "px" units, you need to enable the hotfix "px_scaling" by setting options.hotfixes = ["px_scaling"].
   });
   const htmlBody = printDocument.content.html;
   const htmlHeader = printDocument.header.html;
@@ -18,8 +22,11 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   // var pageWidth = 841.89;
   // var pageHeight = 595.28;
   // 注意: 计算位置必须取整数, 不然计算表格时算法会出现下一行的开始位置小于上一行的结束位置, 造成算法错乱.
-  let pageWidth = 1123;
-  let pageHeight = 794;
+  const paperSize = papers[paperName];
+  let pageWidth =
+    printDocument.printOptions.orientation == PaperOrientation.Portrait ? paperSize.width : paperSize.height;
+  let pageHeight =
+    printDocument.printOptions.orientation == PaperOrientation.Portrait ? paperSize.height : paperSize.width;
   let offsetWidth = 2; //截图时去除容器的外层边框, 否则会把容器的外层边线也复制到PDF中.
   // let contentWidth = htmlBody.offsetWidth;
   let contentHeight = htmlBody.offsetHeight;
@@ -32,12 +39,12 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
     async: false, // 是否异步解析和呈现元素
     scale: scale, // 处理模糊问题, 低于3截图会模糊
     dpi: 300, // 处理模糊问题
-    background: "#ffffff", // 一定要添加背景颜色，否则出来的图片，背景全部都是透明的
+    background: '#ffffff' // 一定要添加背景颜色，否则出来的图片，背景全部都是透明的
     // width: contentWidth, // canvas宽度
     // height: contentHeight
   };
 
-  const margin = printDocument.margin;
+  const margin = printDocument.printOptions.margin;
   // const margin = {
   //   left: 36,
   //   top: 36,
@@ -53,38 +60,33 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   let headerWidth = pageWidth - margin.left - margin.right;
   let headerPageImageData;
   let headerCanvas = await getElementCanvas(htmlHeader, options);
-  
-  let headerCanvasContainer = document.getElementById("canvas-header");
+
+  let headerCanvasContainer = document.getElementById('canvas-header');
   headerCanvasContainer?.appendChild(headerCanvas);
 
-  let headerContext = headerCanvas.getContext("2d", {
-    willReadFrequently: true,
+  let headerContext = headerCanvas.getContext('2d', {
+    willReadFrequently: true
   });
 
   // headerZoomRatio = headerCanvas.height / scale / headerHeight;
-  headerPageImageData = headerContext.getImageData(
-    0,
-    0,
-    (headerWidth - offsetWidth) * scale,
-    headerHeight * scale
-  );
+  headerPageImageData = headerContext.getImageData(0, 0, (headerWidth - offsetWidth) * scale, headerHeight * scale);
   jsPdf.addImage(
     headerPageImageData,
-    "JPEG",
+    'JPEG',
     margin.left,
     margin.top,
     headerWidth - offsetWidth,
     headerHeight,
-    "header",
-    "FAST"
+    'header',
+    'FAST'
   ); //alias参数: 给别名header, 可以重用页眉图片.
 
   let footerWidth = pageWidth - margin.left - margin.right;
-  let footerHeight = Number(htmlFooter.offsetHeight);;
+  let footerHeight = Number(htmlFooter.offsetHeight);
 
   const footerCanvas = await getElementCanvas(htmlFooter, options);
-  
-  let footerCanvasContainer = document.getElementById("canvas-footer");
+
+  let footerCanvasContainer = document.getElementById('canvas-footer');
   footerCanvasContainer?.appendChild(footerCanvas);
 
   // let footerContentWidth = htmlFooter.offsetWidth;
@@ -93,22 +95,16 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   // let footerTopOffset = headerRect.top;
   // let footerZoomRatio = 1;
   let footerPageImageData;
-  let footerContext = footerCanvas.getContext("2d", {
-    willReadFrequently: true,
+  let footerContext = footerCanvas.getContext('2d', {
+    willReadFrequently: true
   });
   // footerZoomRatio = footerCanvas.height / scale / footerHeight;
-  footerPageImageData = footerContext.getImageData(
-    0,
-    0,
-    (footerWidth - offsetWidth) * scale,
-    footerHeight * scale
-  );
+  footerPageImageData = footerContext.getImageData(0, 0, (footerWidth - offsetWidth) * scale, footerHeight * scale);
 
   let footerText = printDocument.footer.text;
-  let pageNumberHeight = 0;  
+  let pageNumberHeight = 0;
   let pageNumberY = pageHeight - margin.bottom;
-  if(footerText && printDocument.footer.text.newLine)
-  {
+  if (footerText && printDocument.footer.text.newLine) {
     var pageNumberOptions = {
       font: footerText.fontFamily,
       fontSize: footerText.fontSize,
@@ -118,24 +114,18 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
     var dimensions = jsPdf.getTextDimensions(printDocument.footer.text.rightText, pageNumberOptions);
 
     //默认页码上下间距
-    const defaultLineSpacing = 5; 
+    const defaultLineSpacing = 5;
     let marginTop = 0;
-    if(printDocument.footer?.text?.margin?.top)
-    {
+    if (printDocument.footer?.text?.margin?.top) {
       marginTop = printDocument.footer?.text?.margin?.top;
-    }
-    else
-    {
+    } else {
       marginTop = defaultLineSpacing;
     }
 
     let marginBottom = 0;
-    if(printDocument.footer?.text?.margin?.bottom)
-    {
+    if (printDocument.footer?.text?.margin?.bottom) {
       marginBottom = printDocument.footer?.text?.margin?.bottom;
-    }
-    else
-    {
+    } else {
       marginBottom = defaultLineSpacing;
     }
 
@@ -149,8 +139,8 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   let imgHeight = pageHeight - bodyMarginTop - bodyMarginBottom - pageNumberHeight;
 
   const bodyCanvas = await getElementCanvas(htmlBody, options);
-  
-  let bodyCanvasContainer = document.getElementById("canvas-body");
+
+  let bodyCanvasContainer = document.getElementById('canvas-body');
   bodyCanvasContainer?.appendChild(bodyCanvas);
 
   // 返回图片的二进制数据
@@ -161,16 +151,14 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   // let pageStartPosition = 0;
   // let pageEndPosition = 0;
 
-  let context = bodyCanvas.getContext("2d", {
-    willReadFrequently: true,
+  let context = bodyCanvas.getContext('2d', {
+    willReadFrequently: true
   });
 
   //计算Canvas与图片html高度缩放比率.
   let bodyRect = getElementRect(htmlBody);
   let bodyTopOffset = bodyRect.top;
-  let zoomRatio = Number(
-    (bodyCanvas.height / scale / contentHeight).toFixed(0)
-  );
+  let zoomRatio = Number((bodyCanvas.height / scale / contentHeight).toFixed(0));
 
   let sourceX = 0;
   let sourceWidth = pageWidth - margin.left - margin.right;
@@ -186,10 +174,7 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
     currentPageStartPosition
   );
 
-  while (
-    currentPageEndPosition <= contentHeight &&
-    currentPageEndPosition >= 0
-  ) {
+  while (currentPageEndPosition <= contentHeight && currentPageEndPosition >= 0) {
     let currentPageHeight = currentPageEndPosition - currentPageStartPosition;
 
     //当表格被拆分时, 新页的第一行表格线变窄, 因此向前偏移1个像素(应该按照表格线宽度向上偏移).
@@ -201,9 +186,9 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
       (currentPageHeight + pageOffsetX) * scale
     );
 
-    if (currentPageIndex === 100) {
-      downloadImageData(currentPageImageData, fileName + ".png");
-      downloadImageData(footerPageImageData, fileName + "_footer.png");
+    if (currentPageIndex === -1) {
+      downloadImageData(currentPageImageData, fileName + '.png');
+      downloadImageData(footerPageImageData, fileName + '_footer.png');
     }
 
     if (currentPageIndex > 1) {
@@ -211,39 +196,30 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
     }
 
     //添加页眉
-    jsPdf.addImage(
-      headerPageImageData,
-      "JPEG",
-      margin.left,
-      36,
-      headerWidth - 2,
-      headerHeight,
-      "header",
-      "FAST"
-    );
+    jsPdf.addImage(headerPageImageData, 'JPEG', margin.left, 36, headerWidth - 2, headerHeight, 'header', 'FAST');
 
     //添加页面
     jsPdf.addImage(
       currentPageImageData,
-      "JPEG",
+      'JPEG',
       margin.left,
       bodyMarginTop,
       sourceWidth,
       currentPageHeight + pageOffsetX,
       undefined,
-      "FAST"
+      'FAST'
     );
 
     //添加页脚
     jsPdf.addImage(
       footerPageImageData,
-      "JPEG",
+      'JPEG',
       margin.left,
       pageHeight - margin.bottom - pageNumberHeight - footerHeight,
       footerWidth - 2,
       footerHeight,
-      "footer",
-      "FAST"
+      'footer',
+      'FAST'
     ); //alias参数: 给别名footer, 可以重用页脚图片.
 
     // jsPdf.addImage(footerPageImageData, "JPEG", margin.left, pageHeight - footerContentHeight - margin.bottom, (
@@ -252,22 +228,22 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
     //设置透明度
     jsPdf.setGState(
       jsPdf.GState({
-        opacity: 0.4,
+        opacity: 0.4
       })
     );
     //设置字体颜色
-    jsPdf.setTextColor("#8E8E8E");
+    jsPdf.setTextColor('#8E8E8E');
     //设置字体大小
     jsPdf.setFontSize(72);
     //添加水印文字
-    jsPdf.text("Watermark", pageWidth / 2, pageHeight / 2, {
-      align: "center",
-      angle: 0,
+    jsPdf.text('Watermark', pageWidth / 2, pageHeight / 2, {
+      align: 'center',
+      angle: 0
     });
     //恢复设置透明度
     jsPdf.setGState(
       jsPdf.GState({
-        opacity: 1,
+        opacity: 1
       })
     );
 
@@ -288,27 +264,22 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   let pageCount = currentPageIndex - 1;
 
   //设置字体颜色
-  jsPdf.setTextColor("#000000");
+  jsPdf.setTextColor('#000000');
   //设置字体大小
   let pageNumberFontSize = 9;
   jsPdf.setFontSize(pageNumberFontSize);
   for (let i = 1; i <= pageCount; i++) {
     const pageParameters: PageParameter = {
       pageNumber: i,
-      pageCount: pageCount,
+      pageCount: pageCount
     };
-    const pageText = "Page {{pageNumber}} of {{pageCount}}";
-    let newPageText = pageText.replace(
-      /\{\{(\w+)\}\}/g,
-      (match, p1: string) => {
-        return pageParameters[p1] || match;
-      }
-    );
+    const pageText = 'Page {{pageNumber}} of {{pageCount}}';
+    let newPageText = pageText.replace(/\{\{(\w+)\}\}/g, (match, p1: string) => {
+      return pageParameters[p1] || match;
+    });
     jsPdf.setPage(i);
     //添加页码
-    let textWidth =
-      (jsPdf.getStringUnitWidth(newPageText) * pageNumberFontSize) /
-      jsPdf.internal.scaleFactor;
+    let textWidth = (jsPdf.getStringUnitWidth(newPageText) * pageNumberFontSize) / jsPdf.internal.scaleFactor;
     let pageNumberX = pageWidth - margin.right - textWidth - 5;
     jsPdf.text(newPageText, pageNumberX, pageNumberY);
   }
@@ -321,10 +292,7 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
 
 export default html2pdf;
 
-function getElementCanvas(
-  canvasElement: any,
-  canvasOptions: any
-): Promise<any> {
+function getElementCanvas(canvasElement: any, canvasOptions: any): Promise<any> {
   return new Promise((resolve, reject) => {
     html2canvas(canvasElement, canvasOptions)
       .then((canvas: any) => {
@@ -354,93 +322,83 @@ function getPageElements(
   let pageEndPosition = maxPagePosition;
   while (child) {
     let elementRect = getElementRect(child);
-    let elementX = Number(
-      ((elementRect.top - bodyTopOffset) * zoomRatio).toFixed(0)
-    );
+    let elementX = Number(((elementRect.top - bodyTopOffset) * zoomRatio).toFixed(0));
     // let elementHeight = Number((elementRect.height * zoomRatio).toFixed(0));
-    let elementEndPosition = Number(
-      (
-        (elementRect.top + elementRect.height - bodyTopOffset) *
-        zoomRatio
-      ).toFixed(0)
-    );
+    let elementEndPosition = Number(((elementRect.top + elementRect.height - bodyTopOffset) * zoomRatio).toFixed(0));
     //如果元素是TABLE, 则需要判断当前页是否包含该表格.
-    if (child.tagName === "TD" || child.tagName === "TH") {
+    if (child.tagName === 'TD' || child.tagName === 'TH') {
       //TD和TH不需要处理, 只需要按照父元素TR进行分页.
     } else {
       //其他类型的元素.
       if (elementEndPosition <= pageStartPosition) {
         //元素结束位置小于当前页开始位置, 说明元素不在页内, 不用拆分元素.
         console.log(
-          "元素",
+          '元素',
           child,
-          "位置小于第",
+          '位置小于第',
           pageIndex,
-          "页的开始位置.",
-          " Element start position:",
+          '页的开始位置.',
+          ' Element start position:',
           elementX,
-          "Element end position:",
+          'Element end position:',
           elementEndPosition,
-          "Page start position:",
+          'Page start position:',
           pageStartPosition,
-          "Page end position:",
+          'Page end position:',
           maxPagePosition
         );
-      } else if (
-        elementX >= pageStartPosition &&
-        elementEndPosition < maxPagePosition
-      ) {
+      } else if (elementX >= pageStartPosition && elementEndPosition < maxPagePosition) {
         //元素完全在页内, 不用拆分元素
         console.log(
-          "元素",
+          '元素',
           child,
-          "完全在第",
+          '完全在第',
           pageIndex,
-          "页内.",
-          " Element start position:",
+          '页内.',
+          ' Element start position:',
           elementX,
-          "Element end position:",
+          'Element end position:',
           elementEndPosition,
-          "Page start position:",
+          'Page start position:',
           pageStartPosition,
-          "Page end position:",
+          'Page end position:',
           maxPagePosition
         );
       } else if (elementX > maxPagePosition) {
         //元素开始位置大于当前页结束位置, 说明元素不在页内, 不用拆分元素.
         console.log(
-          "元素",
+          '元素',
           child,
-          "开始位置大于第",
+          '开始位置大于第',
           pageIndex,
-          "页的结束位置.",
-          " Element start position:",
+          '页的结束位置.',
+          ' Element start position:',
           elementX,
-          "Element end position:",
+          'Element end position:',
           elementEndPosition,
-          "Page start position:",
+          'Page start position:',
           pageStartPosition,
-          "Page end position:",
+          'Page end position:',
           maxPagePosition
         );
       } else {
         //元素跨页了, 需要处理分页
         console.log(
-          "元素",
+          '元素',
           child,
-          "跨越第",
+          '跨越第',
           pageIndex,
-          "页.",
-          " Element start position:",
+          '页.',
+          ' Element start position:',
           elementX,
-          "Element end position:",
+          'Element end position:',
           elementEndPosition,
-          "Page start position:",
+          'Page start position:',
           pageStartPosition,
-          "Page end position:",
+          'Page end position:',
           maxPagePosition
         );
-        if (child.tagName != "TR" && child.firstElementChild) {
+        if (child.tagName != 'TR' && child.firstElementChild) {
           //如果元素不是TR, 并且元素包含子元素, 则遍历子元素, 根据子元素分页.
           pageEndPosition = getPageElements(
             child,
@@ -454,23 +412,23 @@ function getPageElements(
         } else {
           //如果是TR(TODO: 目前不支持TR超过一页, 需要解决TR超过一页的问题)或者是没有子元素.
           console.log(
-            "元素",
+            '元素',
             child,
-            "跨越第",
+            '跨越第',
             pageIndex,
-            "页.",
-            " Element start position:",
+            '页.',
+            ' Element start position:',
             elementX,
-            "Element end position:",
+            'Element end position:',
             elementEndPosition,
-            "Page start position:",
+            'Page start position:',
             pageStartPosition,
-            "Page end position:",
+            'Page end position:',
             maxPagePosition
           );
-          if (child.tagName === "THEAD") {
+          if (child.tagName === 'THEAD') {
             pageEndPosition = elementX;
-          } else if (child.tagName === "TR") {
+          } else if (child.tagName === 'TR') {
             //TODO, 如果是第一行, 则需要把表头一起换页.
             pageEndPosition = elementX;
           } else {
@@ -488,13 +446,7 @@ function getPageElements(
               );
             } else {
               //如果是其他dev等元素中的文本跨页, 则按照文本行数分页.
-              pageEndPosition = getPageElementPosition(
-                child,
-                elementX,
-                imgHeight,
-                pageIndex,
-                pageStartPosition
-              );
+              pageEndPosition = getPageElementPosition(child, elementX, imgHeight, pageIndex, pageStartPosition);
             }
           }
         }
@@ -516,26 +468,21 @@ function getPageElementPosition(
   pageStartPosition: number
 ) {
   let pageCurrentIndex = 0;
-  if (element.getAttribute("page-index")) {
-    pageCurrentIndex = parseInt(element.getAttribute("page-index"));
+  if (element.getAttribute('page-index')) {
+    pageCurrentIndex = parseInt(element.getAttribute('page-index'));
   }
   let elementPageEndPosition = 0;
-  if (element.getAttribute("page-end-position")) {
-    elementPageEndPosition = parseInt(
-      element.getAttribute("page-end-position")
-    );
+  if (element.getAttribute('page-end-position')) {
+    elementPageEndPosition = parseInt(element.getAttribute('page-end-position'));
   }
 
   let leftHeight = pageStartPosition + imgHeight - elementX;
-  if( pageCurrentIndex > 1)
-  {
+  if (pageCurrentIndex > 1) {
     //该元素已经被拆分过了, 新页剩余空间为整页的高度
     leftHeight = imgHeight;
   }
 
-  let lineHeight = Number(
-    window.getComputedStyle(element).lineHeight.replace("px", "")
-  );
+  let lineHeight = Number(window.getComputedStyle(element).lineHeight.replace('px', ''));
 
   //计算剩余空间可以打印几行
   let elementLineCount = Math.floor(leftHeight / lineHeight);
@@ -546,11 +493,9 @@ function getPageElementPosition(
   let elementPageHeight = Number((elementLineCount * lineHeight).toFixed(0));
   //如果是第一页, 则结束位置为元素的开始位置加页高.
   elementPageEndPosition =
-    elementPageEndPosition === 0
-      ? elementX + elementPageHeight
-      : elementPageEndPosition + elementPageHeight;
-  element.setAttribute("page-end-position", elementPageEndPosition.toString());
-  element.setAttribute("page-index", pageIndex.toString());
+    elementPageEndPosition === 0 ? elementX + elementPageHeight : elementPageEndPosition + elementPageHeight;
+  element.setAttribute('page-end-position', elementPageEndPosition.toString());
+  element.setAttribute('page-index', pageIndex.toString());
   return elementPageEndPosition;
 }
 
@@ -560,19 +505,19 @@ function getScrollOffsets() {
   if (window.pageXOffset != null)
     return {
       x: Number(window.pageXOffset.toFixed(0)),
-      y: Number(window.pageYOffset.toFixed(0)),
+      y: Number(window.pageYOffset.toFixed(0))
     };
   //对标准模式下的IE
   let doc = window.document;
-  if (document.compatMode == "CSS1Compat")
+  if (document.compatMode == 'CSS1Compat')
     return {
       x: Number(doc.documentElement.scrollLeft.toFixed(0)),
-      y: Number(doc.documentElement.scrollTop.toFixed(0)),
+      y: Number(doc.documentElement.scrollTop.toFixed(0))
     };
   //对混杂模式下的浏览器
   return {
     x: Number(doc.body.scrollLeft.toFixed(0)),
-    y: Number(doc.body.scrollTop.toFixed(0)),
+    y: Number(doc.body.scrollTop.toFixed(0))
   };
 }
 
@@ -587,39 +532,39 @@ function getElementRect(element: any) {
     left: Number(x.toFixed(0)),
     top: Number(y.toFixed(0)),
     width: Number(box.width.toFixed(0)),
-    height: Number(box.height.toFixed(0)),
+    height: Number(box.height.toFixed(0))
   };
 }
 
 function dataURLtoBlob(dataurl: any) {
   let arr = dataurl.split(','),
-      mime = arr[0].match(/:(.*?);/)[1],
-      bstr = atob(arr[1]),
-      n = bstr.length,
-      u8arr = new Uint8Array(n);
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]),
+    n = bstr.length,
+    u8arr = new Uint8Array(n);
   while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
+    u8arr[n] = bstr.charCodeAt(n);
   }
   return new Blob([u8arr], {
-      type: mime
+    type: mime
   });
 }
 
-function downloadDataURL(imgData:any, fileName:string) {
+function downloadDataURL(imgData: any, fileName: string) {
   let blob = dataURLtoBlob(imgData);
   let objurl = URL.createObjectURL(blob);
-  let link = document.createElement("a");
+  let link = document.createElement('a');
   link.download = fileName;
   link.href = objurl;
   link.click();
 }
 
-function downloadImageData(imageData:any, fileName:string) {
-  let cvs = document.createElement("canvas");
+function downloadImageData(imageData: any, fileName: string) {
+  let cvs = document.createElement('canvas');
   let ctx = cvs.getContext('2d');
   cvs.width = imageData.width;
   cvs.height = imageData.height;
   ctx?.putImageData(imageData, 0, 0);
-  let imgData = cvs.toDataURL("image/png");
+  let imgData = cvs.toDataURL('image/png');
   downloadDataURL(imgData, fileName);
 }

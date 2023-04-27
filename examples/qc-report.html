@@ -19,14 +19,14 @@
       let htmlFooter = document.getElementById('doc-footer');
       let printDocument = {
         content: {
-          html: htmlBody
+          element: htmlBody
         },
         header: {
-          html: htmlHeader,
+          element: htmlHeader,
           height: 110
         },
         footer: {
-          html: htmlFooter,
+          element: htmlFooter,
           text: { rightText: "Page {{pageNumber}} of {{pageCount}}", newLine: true },
           height: 50
         },

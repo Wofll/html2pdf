@@ -3,20 +3,22 @@ import html2canvas from 'html2canvas';
 import {PageParameter} from 'model/page-parameter';
 import {PrintDocument} from 'model/print-document';
 import {papers} from 'model/papers';
-import {PaperOrientation} from 'model/paper-orientation';
 
 async function html2pdf(printDocument: PrintDocument, fileName: string): Promise<void> {
   const paperName = printDocument.printOptions.paperSize ?? 'a4';
-  const orientation = printDocument.printOptions.orientation === 'landscape' ? 'landscape' : 'portrait';
+  const orientation =
+    printDocument.printOptions.orientation === 'landscape' || printDocument.printOptions.orientation === 'l'
+      ? 'landscape'
+      : 'portrait';
   let jsPdf = new jsPDF({
     orientation: orientation,
     unit: 'px', //Measurement unit (base unit) to be used when coordinates are specified.Possible values are "pt" (points), "mm", "cm", "in", "px", "pc", "em" or "ex".
     format: paperName, //Default is "a4". If you want to use your own format just pass instead of one of the above predefined formats the size as an number-array, e.g. [595.28, 841.89]
     hotfixes: ['px_scaling'] // Note that in order to get the correct scaling for "px" units, you need to enable the hotfix "px_scaling" by setting options.hotfixes = ["px_scaling"].
   });
-  const htmlBody = printDocument.content.html;
-  const htmlHeader = printDocument.header.html;
-  const htmlFooter = printDocument.footer.html;
+  const htmlBody = printDocument.content.element;
+  const htmlHeader = printDocument.header.element;
+  const htmlFooter = printDocument.footer.element;
   const bodyInnerHTML = htmlBody.innerHTML;
   //a4纸的尺寸pt:[595.28,841.89], px:794px*1123px
   // var pageWidth = 841.89;
@@ -24,9 +26,13 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   // 注意: 计算位置必须取整数, 不然计算表格时算法会出现下一行的开始位置小于上一行的结束位置, 造成算法错乱.
   const paperSize = papers[paperName];
   let pageWidth =
-    printDocument.printOptions.orientation == PaperOrientation.Portrait ? paperSize.width : paperSize.height;
+    printDocument.printOptions.orientation === 'portrait' || printDocument.printOptions.orientation === 'p'
+      ? paperSize.width
+      : paperSize.height;
   let pageHeight =
-    printDocument.printOptions.orientation == PaperOrientation.Portrait ? paperSize.height : paperSize.width;
+    printDocument.printOptions.orientation === 'portrait' || printDocument.printOptions.orientation === 'p'
+      ? paperSize.height
+      : paperSize.width;
   let offsetWidth = 2; //截图时去除容器的外层边框, 否则会把容器的外层边线也复制到PDF中.
   // let contentWidth = htmlBody.offsetWidth;
   let contentHeight = htmlBody.offsetHeight;
@@ -45,13 +51,6 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   };
 
   const margin = printDocument.printOptions.margin;
-  // const margin = {
-  //   left: 36,
-  //   top: 36,
-  //   right: 36,
-  //   bottom: 24,
-  // };
-
   // let headerContentWidth = htmlHeader.offsetWidth;
   let headerHeight = Number(htmlHeader.offsetHeight);
   // let headerRect = getElementRect(window, document, htmlHeader);
@@ -427,15 +426,19 @@ function getPageElements(
             maxPagePosition
           );
           if (child.tagName === 'THEAD') {
-            pageEndPosition = elementX;
+            if (elementX < pageEndPosition) {
+              pageEndPosition = elementX;
+            }
           } else if (child.tagName === 'TR') {
             //TODO, 如果是第一行, 则需要把表头一起换页.
-            pageEndPosition = elementX;
+            if (elementX < pageEndPosition) {
+              pageEndPosition = elementX;
+            }
           } else {
             //其他类型的元素.
             if (child.firstElementChild) {
               //如果有子元素, 递归处理子元素
-              pageEndPosition = getPageElements(
+              let childPageEndPosition = getPageElements(
                 child,
                 contentHeight,
                 zoomRatio,
@@ -444,9 +447,21 @@ function getPageElements(
                 pageIndex,
                 pageStartPosition
               );
+              if (childPageEndPosition < pageEndPosition) {
+                pageEndPosition = childPageEndPosition;
+              }
             } else {
               //如果是其他dev等元素中的文本跨页, 则按照文本行数分页.
-              pageEndPosition = getPageElementPosition(child, elementX, imgHeight, pageIndex, pageStartPosition);
+              let childPageEndPosition = getPageElementPosition(
+                child,
+                elementX,
+                imgHeight,
+                pageIndex,
+                pageStartPosition
+              );
+              if (childPageEndPosition < pageEndPosition) {
+                pageEndPosition = childPageEndPosition;
+              }
             }
           }
         }

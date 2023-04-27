@@ -1,6 +1,7 @@
 import { PrintText } from "./print-text";
 
 export interface PrintContent {
-    html: any;
+    element: HTMLElement;
+    html: string;
     text: PrintText;
   }

@@ -1,4 +1,1 @@
-export enum PaperOrientation {
-    Portrait = 'portrait',
-    Landscape = 'landscape'
-}
+export type PaperOrientation = 'portrait' | 'p' | 'landscape' | 'l';

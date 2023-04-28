@@ -3,6 +3,7 @@ import html2canvas from 'html2canvas';
 import {PageParameter} from 'model/page-parameter';
 import {PrintDocument} from 'model/print-document';
 import {papers} from 'model/papers';
+import { PaginationOptions } from 'model/pagination-options';
 
 async function html2pdf(printDocument: PrintDocument, fileName: string): Promise<void> {
   const paperName = printDocument.printOptions.paperSize ?? 'a4';
@@ -173,8 +174,8 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
     currentPageStartPosition
   );
 
-  while (currentPageEndPosition <= contentHeight && currentPageEndPosition >= 0) {
-    let currentPageHeight = currentPageEndPosition - currentPageStartPosition;
+  while (currentPageEndPosition.endPosition <= contentHeight && currentPageEndPosition.endPosition >= 0) {
+    let currentPageHeight = currentPageEndPosition.endPosition - currentPageStartPosition;
 
     //当表格被拆分时, 新页的第一行表格线变窄, 因此向前偏移1个像素(应该按照表格线宽度向上偏移).
     let pageOffsetX = currentPageIndex === 1 ? 0 : 1;
@@ -248,7 +249,7 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
 
     currentPageImageData = null;
     currentPageIndex++;
-    currentPageStartPosition = currentPageEndPosition;
+    currentPageStartPosition = currentPageEndPosition.endPosition;
     currentPageEndPosition = getPageElements(
       htmlBody,
       contentHeight,
@@ -311,14 +312,19 @@ function getPageElements(
   imgHeight: number,
   pageIndex: number,
   pageStartPosition: number
-) {
+): PaginationOptions {
+  let maxPagePosition = pageStartPosition + imgHeight;
+  var paginationOptions: PaginationOptions = {
+    endPosition: maxPagePosition,
+    headerPlaceholderHeight: 0
+  };
   if (pageStartPosition >= contentHeight) {
     //超过页面底部.
-    return -1;
+    paginationOptions.endPosition = -1;
+    return paginationOptions;
   }
+
   let child = element.firstElementChild;
-  let maxPagePosition = pageStartPosition + imgHeight;
-  let pageEndPosition = maxPagePosition;
   while (child) {
     let elementRect = getElementRect(child);
     let elementX = Number(((elementRect.top - bodyTopOffset) * zoomRatio).toFixed(0));
@@ -399,7 +405,7 @@ function getPageElements(
         );
         if (child.tagName != 'TR' && child.firstElementChild) {
           //如果元素不是TR, 并且元素包含子元素, 则遍历子元素, 根据子元素分页.
-          pageEndPosition = getPageElements(
+          paginationOptions = getPageElements(
             child,
             contentHeight,
             zoomRatio,
@@ -426,13 +432,13 @@ function getPageElements(
             maxPagePosition
           );
           if (child.tagName === 'THEAD') {
-            if (elementX < pageEndPosition) {
-              pageEndPosition = elementX;
+            if (elementX < paginationOptions.endPosition) {
+              paginationOptions.endPosition = elementX;
             }
           } else if (child.tagName === 'TR') {
             //TODO, 如果是第一行, 则需要把表头一起换页.
-            if (elementX < pageEndPosition) {
-              pageEndPosition = elementX;
+            if (elementX < paginationOptions.endPosition) {
+              paginationOptions.endPosition = elementX;
             }
           } else {
             //其他类型的元素.
@@ -447,8 +453,8 @@ function getPageElements(
                 pageIndex,
                 pageStartPosition
               );
-              if (childPageEndPosition < pageEndPosition) {
-                pageEndPosition = childPageEndPosition;
+              if (childPageEndPosition.endPosition < paginationOptions.endPosition) {
+                paginationOptions.endPosition = childPageEndPosition.endPosition;
               }
             } else {
               //如果是其他dev等元素中的文本跨页, 则按照文本行数分页.
@@ -459,8 +465,8 @@ function getPageElements(
                 pageIndex,
                 pageStartPosition
               );
-              if (childPageEndPosition < pageEndPosition) {
-                pageEndPosition = childPageEndPosition;
+              if (childPageEndPosition.endPosition < paginationOptions.endPosition) {
+                paginationOptions.endPosition = childPageEndPosition.endPosition;
               }
             }
           }
@@ -469,10 +475,10 @@ function getPageElements(
     }
     child = child.nextElementSibling;
   }
-  if (pageEndPosition > contentHeight) {
-    pageEndPosition = contentHeight;
+  if (paginationOptions.endPosition > contentHeight) {
+    paginationOptions.endPosition = contentHeight;
   }
-  return pageEndPosition;
+  return paginationOptions;
 }
 
 function getPageElementPosition(
@@ -481,7 +487,11 @@ function getPageElementPosition(
   imgHeight: number,
   pageIndex: number,
   pageStartPosition: number
-) {
+): PaginationOptions {
+  var paginationOptions: PaginationOptions = {
+    endPosition: 0,
+    headerPlaceholderHeight: 0
+  };
   let pageCurrentIndex = 0;
   if (element.getAttribute('page-index')) {
     pageCurrentIndex = parseInt(element.getAttribute('page-index'));
@@ -503,7 +513,8 @@ function getPageElementPosition(
   let elementLineCount = Math.floor(leftHeight / lineHeight);
   if (elementLineCount <= 1 && pageCurrentIndex == 0) {
     //剩余高度不够一行, 并且是该元素还未被分页, 则直接从该元素开始分页
-    return elementX;
+    paginationOptions.endPosition = elementX;
+    return paginationOptions;
   }
   let elementPageHeight = Number((elementLineCount * lineHeight).toFixed(0));
   //如果是第一页, 则结束位置为元素的开始位置加页高.
@@ -511,7 +522,8 @@ function getPageElementPosition(
     elementPageEndPosition === 0 ? elementX + elementPageHeight : elementPageEndPosition + elementPageHeight;
   element.setAttribute('page-end-position', elementPageEndPosition.toString());
   element.setAttribute('page-index', pageIndex.toString());
-  return elementPageEndPosition;
+  paginationOptions.endPosition = elementPageEndPosition;
+  return paginationOptions;
 }
 
 //以一个对象的x和y属性放回滚动条的位置

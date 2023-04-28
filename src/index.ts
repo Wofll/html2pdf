@@ -174,9 +174,9 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
     currentPageStartPosition
   );
 
+  console.log("Page",currentPageIndex,currentPageEndPosition);
   while (currentPageEndPosition.endPosition <= contentHeight && currentPageEndPosition.endPosition >= 0) {
     let currentPageHeight = currentPageEndPosition.endPosition - currentPageStartPosition;
-
     //当表格被拆分时, 新页的第一行表格线变窄, 因此向前偏移1个像素(应该按照表格线宽度向上偏移).
     let pageOffsetX = currentPageIndex === 1 ? 0 : 1;
     let currentPageImageData = context.getImageData(
@@ -197,13 +197,45 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
 
     //添加页眉
     jsPdf.addImage(headerPageImageData, 'JPEG', margin.left, 36, headerWidth - 2, headerHeight, 'header', 'FAST');
+    
+    //添加Table header.
+    let peagedTableHeaderOffsetX = 0;
+    if (currentPageEndPosition.peagedTable) {
+      const peagedTableHeader = getTableHeader(currentPageEndPosition.peagedTable);
+      if (peagedTableHeader) {
+        const peagedTableRect = getElementRect(peagedTableHeader);
+
+        //当被拆分的表格的表头位置小于当前页开始位置时(不是表格被拆分的第一页), 添加表头.
+        if (peagedTableRect.top < currentPageStartPosition) {
+          peagedTableHeaderOffsetX = peagedTableRect.height;
+          const peagedTableHeaderX = Number(((peagedTableRect.top - bodyTopOffset) * zoomRatio).toFixed(0));
+          let peagedTableImageData = context.getImageData(
+            sourceX * scale,
+            peagedTableHeaderX * scale,
+            (sourceWidth - offsetWidth) * scale,
+            peagedTableRect.height * scale
+          );
+
+          jsPdf.addImage(
+            peagedTableImageData,
+            'JPEG',
+            margin.left,
+            bodyMarginTop,
+            sourceWidth,
+            peagedTableRect.height + pageOffsetX,
+            undefined,
+            'FAST'
+          );
+        }
+      }
+    }
 
     //添加页面
     jsPdf.addImage(
       currentPageImageData,
       'JPEG',
       margin.left,
-      bodyMarginTop,
+      bodyMarginTop + peagedTableHeaderOffsetX,
       sourceWidth,
       currentPageHeight + pageOffsetX,
       undefined,
@@ -247,6 +279,17 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
       })
     );
 
+    let tableHeaderOffset = 0;
+    if(currentPageEndPosition.peagedTable)
+    {
+      const peagedTableHeader = getTableHeader(currentPageEndPosition.peagedTable);
+      if(peagedTableHeader)
+      {
+        const peagedTableRect = getElementRect(peagedTableHeader);
+        tableHeaderOffset = peagedTableRect.height;
+      }
+    }
+
     currentPageImageData = null;
     currentPageIndex++;
     currentPageStartPosition = currentPageEndPosition.endPosition;
@@ -255,10 +298,11 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
       contentHeight,
       zoomRatio,
       bodyTopOffset,
-      imgHeight,
+      imgHeight - tableHeaderOffset,
       currentPageIndex,
       currentPageStartPosition
-    );
+    );    
+    console.log("Page",currentPageIndex,currentPageEndPosition);
   }
 
   let pageCount = currentPageIndex - 1;
@@ -315,8 +359,7 @@ function getPageElements(
 ): PaginationOptions {
   let maxPagePosition = pageStartPosition + imgHeight;
   var paginationOptions: PaginationOptions = {
-    endPosition: maxPagePosition,
-    headerPlaceholderHeight: 0
+    endPosition: maxPagePosition
   };
   if (pageStartPosition >= contentHeight) {
     //超过页面底部.
@@ -403,9 +446,17 @@ function getPageElements(
           'Page end position:',
           maxPagePosition
         );
+        if(child.tagName === 'TABLE' )
+        {
+          //表格跨页, 记录跨页的表格
+          if(!paginationOptions.peagedTable)
+          {
+            paginationOptions.peagedTable = child;
+          }
+        }
         if (child.tagName != 'TR' && child.firstElementChild) {
           //如果元素不是TR, 并且元素包含子元素, 则遍历子元素, 根据子元素分页.
-          paginationOptions = getPageElements(
+          let childPaginationOptions = getPageElements(
             child,
             contentHeight,
             zoomRatio,
@@ -414,6 +465,11 @@ function getPageElements(
             pageIndex,
             pageStartPosition
           );
+          paginationOptions.endPosition = childPaginationOptions.endPosition;
+          if(!paginationOptions.peagedTable && childPaginationOptions.peagedTable)
+          {
+            paginationOptions.peagedTable = childPaginationOptions.peagedTable;
+          }
         } else {
           //如果是TR(TODO: 目前不支持TR超过一页, 需要解决TR超过一页的问题)或者是没有子元素.
           console.log(
@@ -489,8 +545,7 @@ function getPageElementPosition(
   pageStartPosition: number
 ): PaginationOptions {
   var paginationOptions: PaginationOptions = {
-    endPosition: 0,
-    headerPlaceholderHeight: 0
+    endPosition: 0
   };
   let pageCurrentIndex = 0;
   if (element.getAttribute('page-index')) {
@@ -575,6 +630,16 @@ function dataURLtoBlob(dataurl: any) {
   return new Blob([u8arr], {
     type: mime
   });
+}
+
+function getTableHeader(elementTable: HTMLElement): HTMLElement | undefined {
+  let child = elementTable.firstElementChild;
+  while (child) {
+      if (child.tagName === 'THEAD') {
+          return child as HTMLElement;
+      }
+  }
+  return undefined;
 }
 
 function downloadDataURL(imgData: any, fileName: string) {

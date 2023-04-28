@@ -209,6 +209,7 @@
 .table-data-evaluation thead {
   font-size: 12px !important;
   background-color: #c0e8ff;
+  display: table-header-group;
   /* ($iqap-blue, 100) */
 }
 

@@ -175,7 +175,11 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   );
 
   console.log("Page",currentPageIndex,currentPageEndPosition);
-  while (currentPageEndPosition.endPosition <= contentHeight && currentPageEndPosition.endPosition >= 0) {
+  while (
+    currentPageEndPosition.endPosition <= contentHeight &&
+    currentPageEndPosition.endPosition >= 0 &&
+    currentPageEndPosition.endPosition - currentPageStartPosition > 2 //剩余高度小于2个像素, 忽略最后一页.
+  ) {
     let currentPageHeight = currentPageEndPosition.endPosition - currentPageStartPosition;
     //当表格被拆分时, 新页的第一行表格线变窄, 因此向前偏移1个像素(应该按照表格线宽度向上偏移).
     let pageOffsetX = currentPageIndex === 1 ? 0 : 1;
@@ -197,7 +201,7 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
 
     //添加页眉
     jsPdf.addImage(headerPageImageData, 'JPEG', margin.left, 36, headerWidth - 2, headerHeight, 'header', 'FAST');
-    
+
     //添加Table header.
     let peagedTableHeaderOffsetX = 0;
     if (currentPageEndPosition.peagedTable) {
@@ -280,11 +284,9 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
     );
 
     let tableHeaderOffset = 0;
-    if(currentPageEndPosition.peagedTable)
-    {
+    if (currentPageEndPosition.peagedTable) {
       const peagedTableHeader = getTableHeader(currentPageEndPosition.peagedTable);
-      if(peagedTableHeader)
-      {
+      if (peagedTableHeader) {
         const peagedTableRect = getElementRect(peagedTableHeader);
         tableHeaderOffset = peagedTableRect.height;
       }
@@ -301,8 +303,8 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
       imgHeight - tableHeaderOffset,
       currentPageIndex,
       currentPageStartPosition
-    );    
-    console.log("Page",currentPageIndex,currentPageEndPosition);
+    );
+    console.log('Page', currentPageIndex, currentPageEndPosition);
   }
 
   let pageCount = currentPageIndex - 1;

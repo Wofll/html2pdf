@@ -9,19 +9,6 @@
   font-family: arial, sans-serif;
 }
 
-#doc-header {
-  margin: 0px 36px 0px 36px;
-  height: 110px;
-}
-
-#doc-body {
-  margin: 0px 36px 0px 36px;
-}
-
-#doc-footer {
-  margin: 0px 36px 0px 36px;
-  height: 110px;
-}
 /* Panel icons */
 .panel-icon_reagent::after {
   background-image: url("../../images/work-aid/reagent.svg");

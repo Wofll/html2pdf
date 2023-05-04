@@ -19,7 +19,15 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   });
   const htmlBody = printDocument.content.element;
   const htmlHeader = printDocument.header.element;
-  const htmlFooter = printDocument.footer.element;
+  if(printDocument.header.height)
+  {    
+    htmlHeader.style.height = printDocument.header.height + 'px';
+  }
+  const htmlFooter = printDocument.footer.element;  
+  if(printDocument.header.height)
+  {    
+    htmlFooter.style.height = printDocument.footer.height + 'px';
+  }
   const bodyInnerHTML = htmlBody.innerHTML;
   //a4纸的尺寸pt:[595.28,841.89], px:794px*1123px
   // var pageWidth = 841.89;
@@ -52,6 +60,13 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   };
 
   const margin = printDocument.printOptions.margin;
+  htmlHeader.style.marginLeft  = margin.left + 'px';
+  htmlHeader.style.marginRight  = margin.right + 'px';
+  htmlBody.style.marginLeft  = margin.left + 'px';
+  htmlBody.style.marginRight  = margin.right + 'px';
+  htmlFooter.style.marginLeft  = margin.left + 'px';
+  htmlFooter.style.marginRight  = margin.right + 'px';
+
   // let headerContentWidth = htmlHeader.offsetWidth;
   let headerHeight = Number(htmlHeader.offsetHeight);
   // let headerRect = getElementRect(window, document, htmlHeader);
@@ -61,8 +76,8 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   let headerPageImageData;
   let headerCanvas = await getElementCanvas(htmlHeader, options);
 
-  let headerCanvasContainer = document.getElementById('canvas-header');
-  headerCanvasContainer?.appendChild(headerCanvas);
+  // let headerCanvasContainer = document.getElementById('canvas-header');
+  // headerCanvasContainer?.appendChild(headerCanvas);
 
   let headerContext = headerCanvas.getContext('2d', {
     willReadFrequently: true
@@ -86,8 +101,8 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
 
   const footerCanvas = await getElementCanvas(htmlFooter, options);
 
-  let footerCanvasContainer = document.getElementById('canvas-footer');
-  footerCanvasContainer?.appendChild(footerCanvas);
+  // let footerCanvasContainer = document.getElementById('canvas-footer');
+  // footerCanvasContainer?.appendChild(footerCanvas);
 
   // let footerContentWidth = htmlFooter.offsetWidth;
   // let footerContentHeight = htmlFooter.offsetHeight;
@@ -140,8 +155,8 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
 
   const bodyCanvas = await getElementCanvas(htmlBody, options);
 
-  let bodyCanvasContainer = document.getElementById('canvas-body');
-  bodyCanvasContainer?.appendChild(bodyCanvas);
+  // let bodyCanvasContainer = document.getElementById('canvas-body');
+  // bodyCanvasContainer?.appendChild(bodyCanvas);
 
   // 返回图片的二进制数据
   // let bodyImageData = bodyCanvas.toDataURL("image/png");

@@ -43,8 +43,6 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
       ? paperSize.height
       : paperSize.width;
   let offsetWidth = 2; //截图时去除容器的外层边框, 否则会把容器的外层边线也复制到PDF中.
-  // let contentWidth = htmlBody.offsetWidth;
-  let contentHeight = htmlBody.offsetHeight;
 
   const scale = 3;
   // html2canvas配置项
@@ -66,6 +64,9 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   htmlBody.style.marginRight  = margin.right + 'px';
   htmlFooter.style.marginLeft  = margin.left + 'px';
   htmlFooter.style.marginRight  = margin.right + 'px';
+
+  let contentHeight = htmlBody.offsetHeight;
+  // let contentWidth = htmlBody.offsetWidth;
 
   // let headerContentWidth = htmlHeader.offsetWidth;
   let headerHeight = Number(htmlHeader.offsetHeight);

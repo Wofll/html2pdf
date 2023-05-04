@@ -222,7 +222,7 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
     let peagedTableHeaderOffsetX = 0;
     if (currentPageEndPosition.peagedTable) {
       const peagedTableHeader = getTableHeader(currentPageEndPosition.peagedTable);
-      if (peagedTableHeader) {
+      if (peagedTableHeader && window.getComputedStyle(peagedTableHeader).display === 'table-header-group') {
         const peagedTableRect = getElementRect(peagedTableHeader);
 
         //当被拆分的表格的表头位置小于当前页开始位置时(不是表格被拆分的第一页), 添加表头.
@@ -302,7 +302,7 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
     let tableHeaderOffset = 0;
     if (currentPageEndPosition.peagedTable) {
       const peagedTableHeader = getTableHeader(currentPageEndPosition.peagedTable);
-      if (peagedTableHeader) {
+      if (peagedTableHeader && window.getComputedStyle(peagedTableHeader).display === 'table-header-group') {
         const peagedTableRect = getElementRect(peagedTableHeader);
         tableHeaderOffset = peagedTableRect.height;
       }

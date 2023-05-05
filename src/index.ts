@@ -3,7 +3,7 @@ import html2canvas from 'html2canvas';
 import {PageParameter} from 'model/page-parameter';
 import {PrintDocument} from 'model/print-document';
 import {papers} from 'model/papers';
-import { PaginationOptions } from 'model/pagination-options';
+import {PaginationOptions} from 'model/pagination-options';
 
 async function html2pdf(printDocument: PrintDocument, fileName: string): Promise<void> {
   const paperName = printDocument.printOptions.paperSize ?? 'a4';
@@ -19,13 +19,11 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   });
   const htmlBody = printDocument.content.element;
   const htmlHeader = printDocument.header.element;
-  if(printDocument.header.height)
-  {    
+  if (printDocument.header.height) {
     htmlHeader.style.height = printDocument.header.height + 'px';
   }
-  const htmlFooter = printDocument.footer.element;  
-  if(printDocument.header.height)
-  {    
+  const htmlFooter = printDocument.footer.element;
+  if (printDocument.header.height) {
     htmlFooter.style.height = printDocument.footer.height + 'px';
   }
   const bodyInnerHTML = htmlBody.innerHTML;
@@ -58,12 +56,12 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
   };
 
   const margin = printDocument.printOptions.margin;
-  htmlHeader.style.marginLeft  = margin.left + 'px';
-  htmlHeader.style.marginRight  = margin.right + 'px';
-  htmlBody.style.marginLeft  = margin.left + 'px';
-  htmlBody.style.marginRight  = margin.right + 'px';
-  htmlFooter.style.marginLeft  = margin.left + 'px';
-  htmlFooter.style.marginRight  = margin.right + 'px';
+  htmlHeader.style.marginLeft = margin.left + 'px';
+  htmlHeader.style.marginRight = margin.right + 'px';
+  htmlBody.style.marginLeft = margin.left + 'px';
+  htmlBody.style.marginRight = margin.right + 'px';
+  htmlFooter.style.marginLeft = margin.left + 'px';
+  htmlFooter.style.marginRight = margin.right + 'px';
 
   let contentHeight = htmlBody.offsetHeight;
   // let contentWidth = htmlBody.offsetWidth;
@@ -190,7 +188,7 @@ async function html2pdf(printDocument: PrintDocument, fileName: string): Promise
     currentPageStartPosition
   );
 
-  console.log("Page",currentPageIndex,currentPageEndPosition);
+  console.log('Page', currentPageIndex, currentPageEndPosition);
   while (
     currentPageEndPosition.endPosition <= contentHeight &&
     currentPageEndPosition.endPosition >= 0 &&
@@ -414,7 +412,17 @@ function getPageElements(
           maxPagePosition
         );
       } else if (elementX >= pageStartPosition && elementEndPosition < maxPagePosition) {
-        //元素完全在页内, 不用拆分元素
+        //元素完全在页内
+        if (
+          window.getComputedStyle(child).pageBreakBefore === 'always' &&
+          paginationOptions.endPosition > elementX &&
+          !child.getAttribute('page-break-before-index')
+        ) {
+          // 如果设置了page-break-before
+          paginationOptions.endPosition = elementX;
+          child.setAttribute('page-break-before-index', pageIndex.toString());
+        }
+        //如果为设置page-break-before,不用拆分元素
         console.log(
           '元素',
           child,
@@ -464,12 +472,22 @@ function getPageElements(
           'Page end position:',
           maxPagePosition
         );
-        if(child.tagName === 'TABLE' )
-        {
-          //表格跨页, 记录跨页的表格
-          if(!paginationOptions.peagedTable)
+        if (child.tagName === 'TABLE') {
+          if (
+            window.getComputedStyle(child).pageBreakBefore === 'always' &&
+            paginationOptions.endPosition > elementX &&
+            !child.getAttribute('page-break-before-index')
+          ) {
+            // 如果设置了page-break-before
+            paginationOptions.endPosition = elementX;
+            child.setAttribute('page-break-before-index', pageIndex.toString());
+          } 
+          else
           {
-            paginationOptions.peagedTable = child;
+            //表格跨页, 记录跨页的表格
+            if (!paginationOptions.peagedTable) {
+              paginationOptions.peagedTable = child;
+            }
           }
         }
         if (child.tagName != 'TR' && child.firstElementChild) {
@@ -483,9 +501,10 @@ function getPageElements(
             pageIndex,
             pageStartPosition
           );
-          paginationOptions.endPosition = childPaginationOptions.endPosition;
-          if(!paginationOptions.peagedTable && childPaginationOptions.peagedTable)
-          {
+          if (paginationOptions.endPosition > childPaginationOptions.endPosition) {
+            paginationOptions.endPosition = childPaginationOptions.endPosition;
+          }
+          if (!paginationOptions.peagedTable && childPaginationOptions.peagedTable) {
             paginationOptions.peagedTable = childPaginationOptions.peagedTable;
           }
         } else {
@@ -515,32 +534,42 @@ function getPageElements(
               paginationOptions.endPosition = elementX;
             }
           } else {
-            //其他类型的元素.
-            if (child.firstElementChild) {
-              //如果有子元素, 递归处理子元素
-              let childPageEndPosition = getPageElements(
-                child,
-                contentHeight,
-                zoomRatio,
-                bodyTopOffset,
-                imgHeight,
-                pageIndex,
-                pageStartPosition
-              );
-              if (childPageEndPosition.endPosition < paginationOptions.endPosition) {
-                paginationOptions.endPosition = childPageEndPosition.endPosition;
-              }
+            if (
+              window.getComputedStyle(child).pageBreakBefore === 'always' &&
+              paginationOptions.endPosition > elementX &&
+              !child.getAttribute('page-break-before-index')
+            ) {
+              // 如果设置了page-break-before
+              paginationOptions.endPosition = elementX;
+              child.setAttribute('page-break-before-index', pageIndex.toString());
             } else {
-              //如果是其他dev等元素中的文本跨页, 则按照文本行数分页.
-              let childPageEndPosition = getPageElementPosition(
-                child,
-                elementX,
-                imgHeight,
-                pageIndex,
-                pageStartPosition
-              );
-              if (childPageEndPosition.endPosition < paginationOptions.endPosition) {
-                paginationOptions.endPosition = childPageEndPosition.endPosition;
+              //其他类型的元素.
+              if (child.firstElementChild) {
+                //如果有子元素, 递归处理子元素
+                let childPageEndPosition = getPageElements(
+                  child,
+                  contentHeight,
+                  zoomRatio,
+                  bodyTopOffset,
+                  imgHeight,
+                  pageIndex,
+                  pageStartPosition
+                );
+                if (childPageEndPosition.endPosition < paginationOptions.endPosition) {
+                  paginationOptions.endPosition = childPageEndPosition.endPosition;
+                }
+              } else {
+                //如果是其他dev等元素中的文本跨页, 则按照文本行数分页.
+                let childPageEndPosition = getPageElementPosition(
+                  child,
+                  elementX,
+                  imgHeight,
+                  pageIndex,
+                  pageStartPosition
+                );
+                if (childPageEndPosition.endPosition < paginationOptions.endPosition) {
+                  paginationOptions.endPosition = childPageEndPosition.endPosition;
+                }
               }
             }
           }
@@ -653,9 +682,9 @@ function dataURLtoBlob(dataurl: any) {
 function getTableHeader(elementTable: HTMLElement): HTMLElement | undefined {
   let child = elementTable.firstElementChild;
   while (child) {
-      if (child.tagName === 'THEAD') {
-          return child as HTMLElement;
-      }
+    if (child.tagName === 'THEAD') {
+      return child as HTMLElement;
+    }
   }
   return undefined;
 }

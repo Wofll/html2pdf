@@ -422,6 +422,15 @@ function getPageElements(
           paginationOptions.endPosition = elementX;
           child.setAttribute('page-break-before-index', pageIndex.toString());
         }
+        else if (
+          window.getComputedStyle(child).pageBreakAfter === 'always' &&
+          paginationOptions.endPosition > elementEndPosition &&
+          !child.getAttribute('page-break-after-index')
+        ) {
+          // 如果设置了page-break-before
+          paginationOptions.endPosition = elementEndPosition;
+          child.setAttribute('page-break-after-index', pageIndex.toString());
+        }
         //如果为设置page-break-before,不用拆分元素
         console.log(
           '元素',
@@ -481,6 +490,15 @@ function getPageElements(
             // 如果设置了page-break-before
             paginationOptions.endPosition = elementX;
             child.setAttribute('page-break-before-index', pageIndex.toString());
+          } 
+          else if (
+            window.getComputedStyle(child).pageBreakAfter === 'always' &&
+            paginationOptions.endPosition > elementEndPosition &&
+            !child.getAttribute('page-break-after-index')
+          ) {
+            // 如果设置了page-break-before
+            paginationOptions.endPosition = elementEndPosition;
+            child.setAttribute('page-break-after-index', pageIndex.toString());
           } 
           else
           {
@@ -542,7 +560,17 @@ function getPageElements(
               // 如果设置了page-break-before
               paginationOptions.endPosition = elementX;
               child.setAttribute('page-break-before-index', pageIndex.toString());
-            } else {
+            } 
+            else if (
+              window.getComputedStyle(child).pageBreakAfter === 'always' &&
+              paginationOptions.endPosition > elementEndPosition &&
+              !child.getAttribute('page-break-after-index')
+            ) {
+              // 如果设置了page-break-before
+              paginationOptions.endPosition = elementEndPosition;
+              child.setAttribute('page-break-after-index', pageIndex.toString());
+            } 
+            else {
               //其他类型的元素.
               if (child.firstElementChild) {
                 //如果有子元素, 递归处理子元素
